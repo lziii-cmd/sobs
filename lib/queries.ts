@@ -1,6 +1,18 @@
 import { db } from './db';
 import type { GridData } from './synthese';
 
+/**
+ * Les deux pilotes ne renvoient pas les dates de la même façon : `pg` construit
+ * des objets Date, Neon renvoie des chaînes. On normalise en ISO pour que le
+ * reste de l'application — et les composants client — voient toujours la même chose.
+ */
+function toIso(value: unknown): string | null {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value.toISOString();
+  const date = new Date(String(value));
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
 export type StoredAnswer = {
   value: string;
   flagged: boolean;
@@ -36,7 +48,7 @@ export async function loadAnswers(): Promise<AnswersById> {
     out[row.question_id] = {
       value: row.value ?? '',
       flagged: Boolean(row.flagged),
-      updatedAt: row.updated_at ?? null,
+      updatedAt: toIso(row.updated_at),
       updatedBy: row.updated_by ?? '',
       revisions: Number(row.revisions ?? 0),
     };
@@ -72,7 +84,11 @@ export async function loadFiles(): Promise<StoredFile[]> {
     SELECT id, filename, mime, size_bytes, note, uploaded_by, created_at
     FROM files ORDER BY created_at DESC
   `) as StoredFile[];
-  return rows.map((f) => ({ ...f, size_bytes: Number(f.size_bytes) }));
+  return rows.map((f) => ({
+    ...f,
+    size_bytes: Number(f.size_bytes),
+    created_at: toIso(f.created_at) ?? '',
+  }));
 }
 
 export type Revision = {
@@ -85,10 +101,11 @@ export type Revision = {
 
 export async function loadRevisions(questionId: string): Promise<Revision[]> {
   const sql = db();
-  return (await sql`
+  const rows = (await sql`
     SELECT id, question_id, value, created_at, created_by
     FROM answer_revisions
     WHERE question_id = ${questionId}
-    ORDER BY created_at DESC
+    ORDER BY created_at DESC, id DESC
   `) as Revision[];
+  return rows.map((r) => ({ ...r, created_at: toIso(r.created_at) ?? '' }));
 }

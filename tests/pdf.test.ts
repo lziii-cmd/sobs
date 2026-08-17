@@ -2,10 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import { buildPdf } from '../lib/pdf';
-import { questions } from '../data/questions';
+import { questions, sections } from '../data/questions';
 import { ellipsize, sanitizeForPdf, wrapText } from '../lib/text';
 
 const measure = (text: string, size: number) => text.length * size * 0.5;
+const sectionsIntros = sections.flatMap((s) => [s.title, s.intro]);
 
 test('les accents français traversent la normalisation sans dommage', () => {
   const input = 'Océanium, référencée, bière, à vérifier, Août, ça, œuf, où';
@@ -75,6 +76,26 @@ test('le PDF contient toutes les réponses saisies, y compris les très longues'
   const bytes = await buildPdf({ answers, grid });
   const doc = await PDFDocument.load(bytes);
   assert.ok(doc.getPageCount() > 10);
+});
+
+test('aucun caractère du PDF ne se dégrade en « ? »', async () => {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+
+  // Tout ce que le générateur écrit doit survivre à l'encodage sans perte.
+  const echantillons = [
+    ...questions.map((q) => `${q.id}. ${q.label}   · PRIORITAIRE`),
+    ...questions.map((q) => q.help ?? ''),
+    ...sectionsIntros,
+    'Océanium · Fiabilité : À vérifier sur place · 4 / 5',
+    "« Évaluation de la visibilité de nos marques »",
+  ];
+
+  for (const texte of echantillons) {
+    const propre = sanitizeForPdf(texte);
+    assert.ok(!propre.includes('?') || texte.includes('?'), `caractère perdu dans : ${texte}`);
+    assert.doesNotThrow(() => font.encodeText(propre));
+  }
 });
 
 test('les polices standard acceptent tous les intitulés du formulaire', async () => {

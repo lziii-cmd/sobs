@@ -202,7 +202,9 @@ export async function buildPdf(input: PdfInput): Promise<Uint8Array> {
       const value = answerText(answer);
 
       doc.ensure(46);
-      doc.write(`${question.id}. ${question.label}${question.priority ? '   ● PRIORITAIRE' : ''}`, {
+      // Le rond plein « ● » du document source n'existe pas dans les polices
+      // standard du PDF : on garde un marqueur équivalent et lisible.
+      doc.write(`${question.id}. ${question.label}${question.priority ? '   · PRIORITAIRE' : ''}`, {
         size: 10,
         font: 'bold',
       });
