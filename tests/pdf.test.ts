@@ -1,0 +1,88 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { buildPdf } from '../lib/pdf';
+import { questions } from '../data/questions';
+import { ellipsize, sanitizeForPdf, wrapText } from '../lib/text';
+
+const measure = (text: string, size: number) => text.length * size * 0.5;
+
+test('les accents français traversent la normalisation sans dommage', () => {
+  const input = 'Océanium, référencée, bière, à vérifier, Août, ça, œuf, où';
+  assert.equal(sanitizeForPdf(input), input);
+});
+
+test('les signes typographiques sont convertis, pas supprimés', () => {
+  assert.equal(sanitizeForPdf('l’enseigne'), "l'enseigne");
+  assert.equal(sanitizeForPdf('“test”'), '"test"');
+  assert.equal(sanitizeForPdf('a — b'), 'a - b');
+  assert.equal(sanitizeForPdf('etc…'), 'etc...');
+  assert.equal(sanitizeForPdf('« Gazelle »'), '« Gazelle »');
+});
+
+test('les caractères non imprimables sont remplacés, pas laissés passer', () => {
+  assert.equal(sanitizeForPdf('bière 🍺'), 'bière ??');
+});
+
+test('le retour à la ligne de l’utilisateur est conservé', () => {
+  const lines = wrapText('un\n\ndeux', 1000, 10, measure);
+  assert.deepEqual(lines, ['un', '', 'deux']);
+});
+
+test('un texte long est coupé pour tenir dans la largeur', () => {
+  const lines = wrapText('mot '.repeat(50).trim(), 100, 10, measure);
+  assert.ok(lines.length > 1);
+  for (const line of lines) assert.ok(measure(line, 10) <= 100, `ligne trop large : ${line}`);
+});
+
+test('un mot plus large que la colonne est coupé au lieu de déborder', () => {
+  const lines = wrapText('a'.repeat(200), 50, 10, measure);
+  assert.ok(lines.length > 1);
+  for (const line of lines) assert.ok(measure(line, 10) <= 50);
+});
+
+test('ellipsize tronque et ajoute des points de suspension', () => {
+  const out = ellipsize('un commentaire vraiment très long', 40, 8, measure);
+  assert.ok(out.endsWith('...'));
+  assert.ok(measure(out, 8) <= 40);
+});
+
+test('le PDF se génère même sans aucune réponse', async () => {
+  const bytes = await buildPdf({ answers: {}, grid: {} });
+  assert.ok(bytes.length > 1000);
+  const doc = await PDFDocument.load(bytes);
+  assert.ok(doc.getPageCount() >= 8, `${doc.getPageCount()} pages`);
+});
+
+test('le PDF contient toutes les réponses saisies, y compris les très longues', async () => {
+  const answers = Object.fromEntries(
+    questions.map((q) => [
+      q.id,
+      {
+        value: `Réponse à ${q.id} — l’Océanium, « Gazelle », 33 Export. ${'texte '.repeat(60)}`,
+        updatedAt: new Date('2026-08-20T10:00:00Z').toISOString(),
+        revisions: 3,
+        flagged: q.id === 'Q1',
+      },
+    ]),
+  );
+
+  const grid = {
+    1: { enseigne: 'O', froid: 'N', note: '4', commentaire: 'Terrasse très visible' },
+    20: { enseigne: 'O', nbRefs: '10', marquesSoboa: 'Gazelle, Flag, Racines' },
+  };
+
+  const bytes = await buildPdf({ answers, grid });
+  const doc = await PDFDocument.load(bytes);
+  assert.ok(doc.getPageCount() > 10);
+});
+
+test('les polices standard acceptent tous les intitulés du formulaire', async () => {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  for (const question of questions) {
+    const text = sanitizeForPdf(`${question.id}. ${question.label} ${question.help ?? ''}`);
+    assert.doesNotThrow(() => font.widthOfTextAtSize(text, 10), `${question.id} illisible`);
+    assert.doesNotThrow(() => font.encodeText(text), `${question.id} non encodable`);
+  }
+});

@@ -1,0 +1,24 @@
+node_modules/
+.next/
+out/
+build/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets — ne doivent jamais partir sur GitHub
+.env
+.env.local
+.env*.local
+
+# Documents source du rapport (données d'entreprise, restent en local)
+*.docx
+*.xlsx
+*.pdf
+
+# Journaux locaux
+dev.log
+*.log
+
+.DS_Store
+Thumbs.db

@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-sobs-50: #f2f8f4;
+  --color-sobs-100: #dcecdf;
+  --color-sobs-200: #bcdcc4;
+  --color-sobs-500: #2f8a52;
+  --color-sobs-600: #1f6e3c;
+  --color-sobs-700: #17552f;
+  --color-paper: #faf9f6;
+  --color-ink: #1b1b1f;
+  --font-sans: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Champs de saisie : un seul style pour tout le site. */
+.field {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #d8d6cf;
+  background: #fff;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  outline: none;
+}
+
+.field:focus {
+  border-color: var(--color-sobs-500);
+  box-shadow: 0 0 0 3px var(--color-sobs-100);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--color-sobs-600);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-sobs-700);
+}
+
+.btn-secondary {
+  background: #fff;
+  border-color: #d8d6cf;
+  color: var(--color-ink);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-sobs-500);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e7e5de;
+  border-radius: 0.75rem;
+}
