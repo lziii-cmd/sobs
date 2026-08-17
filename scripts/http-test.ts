@@ -2,6 +2,7 @@ import './env';
 import assert from 'node:assert/strict';
 import { db } from '../lib/db';
 import { hashPassword } from '../lib/auth';
+import { assertBaseDeTest } from './guard';
 
 /**
  * Test HTTP de bout en bout : lance les vraies routes du site.
@@ -28,6 +29,7 @@ async function login(username: string, password: string): Promise<string | null>
 }
 
 async function main() {
+  assertBaseDeTest();
   const sql = db();
 
   // Comptes de test dédiés, supprimés à la fin.

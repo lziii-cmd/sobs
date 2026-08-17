@@ -1,5 +1,6 @@
 import './env';
 import assert from 'node:assert/strict';
+import { assertBaseDeTest } from './guard';
 import { db } from '../lib/db';
 import { authenticate, hashPassword } from '../lib/auth';
 import { loadAnswers, loadGrid, loadFiles, loadRevisions } from '../lib/queries';
@@ -36,6 +37,7 @@ async function main() {
     console.error('DATABASE_URL manquant.');
     process.exit(1);
   }
+  assertBaseDeTest();
 
   const sql = db();
 
