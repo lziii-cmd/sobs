@@ -2,10 +2,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { currentUser } from '@/lib/auth';
 import { questions, sections } from '@/data/questions';
-import { loadAnswers, loadGrid } from '@/lib/queries';
-import { globalProgress, isAnswered } from '@/lib/progress';
+import { loadAnswers, loadFiles, loadGrid } from '@/lib/queries';
+import { listAccounts } from '@/lib/users';
+import { globalProgress, allProgress, isAnswered } from '@/lib/progress';
 import { computeSynthese } from '@/lib/synthese';
 import { formatDateFr } from '@/lib/text';
+import UsersPanel from '@/components/UsersPanel';
+import AdminAnswers, { type AdminAnswerRow } from '@/components/AdminAnswers';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,11 +16,18 @@ export default async function AdminPage() {
   const user = await currentUser();
   if (!user || user.role !== 'admin') notFound();
 
-  const [stored, grid] = await Promise.all([loadAnswers(), loadGrid()]);
+  const [stored, grid, files, accounts] = await Promise.all([
+    loadAnswers(),
+    loadGrid(),
+    loadFiles(),
+    listAccounts(),
+  ]);
+
   const answers = Object.fromEntries(
     Object.entries(stored).map(([id, a]) => [id, { value: a.value, flagged: a.flagged }]),
   );
   const global = globalProgress(answers);
+  const parSection = allProgress(answers);
   const synthese = computeSynthese(grid);
 
   const recent = Object.entries(stored)
@@ -28,15 +38,32 @@ export default async function AdminPage() {
   const flagged = questions.filter((q) => stored[q.id]?.flagged);
   const missingPriority = questions.filter((q) => q.priority && !isAnswered(stored[q.id]?.value));
 
+  const sectionById = new Map(sections.map((s) => [s.id, s]));
+  const rows: AdminAnswerRow[] = questions.map((question) => {
+    const section = sectionById.get(question.sectionId);
+    const answer = stored[question.id];
+    return {
+      id: question.id,
+      sectionId: question.sectionId,
+      sectionNumber: section?.number ?? '',
+      sectionTitle: section?.title ?? '',
+      label: question.label,
+      priority: question.priority,
+      value: answer?.value ?? '',
+      flagged: Boolean(answer?.flagged),
+      updatedAt: answer?.updatedAt ?? null,
+      updatedBy: answer?.updatedBy ?? '',
+    };
+  });
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">Vue admin</h1>
+          <h1 className="text-xl font-bold tracking-tight">Administration</h1>
           <p className="mt-1 text-sm text-ink/60">
-            {global.answered}/{global.total} réponses · {global.priorityAnswered}/
-            {global.priorityTotal} prioritaires · {synthese.lignesRenseignees}/
-            {synthese.totalEtablissements} lignes de grille
+            Connecté en tant que {user.username}. Cette page n'est visible que des comptes
+            d'administration.
           </p>
         </div>
         <a href="/api/export/pdf" className="btn btn-primary">
@@ -44,6 +71,85 @@ export default async function AdminPage() {
         </a>
       </header>
 
+      {/* ------------------------------------------------------------ chiffres */}
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="card p-4">
+          <p className="text-xs uppercase tracking-wide text-ink/45">Réponses</p>
+          <p className="mt-1 text-2xl font-bold">
+            {global.answered}
+            <span className="text-base font-normal text-ink/40"> / {global.total}</span>
+          </p>
+          <p className="mt-0.5 text-xs text-ink/50">{global.percent} % du questionnaire</p>
+        </div>
+        <div className="card p-4">
+          <p className="text-xs uppercase tracking-wide text-ink/45">Prioritaires</p>
+          <p className="mt-1 text-2xl font-bold">
+            {global.priorityAnswered}
+            <span className="text-base font-normal text-ink/40"> / {global.priorityTotal}</span>
+          </p>
+          <p className="mt-0.5 text-xs text-ink/50">{global.priorityPercent} % des prioritaires</p>
+        </div>
+        <div className="card p-4">
+          <p className="text-xs uppercase tracking-wide text-ink/45">Grille CHR</p>
+          <p className="mt-1 text-2xl font-bold">
+            {synthese.lignesRenseignees}
+            <span className="text-base font-normal text-ink/40">
+              {' '}
+              / {synthese.totalEtablissements}
+            </span>
+          </p>
+          <p className="mt-0.5 text-xs text-ink/50">lignes renseignées</p>
+        </div>
+        <div className="card p-4">
+          <p className="text-xs uppercase tracking-wide text-ink/45">Fichiers</p>
+          <p className="mt-1 text-2xl font-bold">{files.length}</p>
+          <p className="mt-0.5 text-xs text-ink/50">
+            <Link href="/fichiers" className="text-sobs-700 underline underline-offset-2">
+              gérer les dépôts
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------- comptes */}
+      <section>
+        <h2 className="mb-1 text-lg font-semibold">Comptes</h2>
+        <p className="mb-3 text-sm text-ink/55">
+          Création, renommage, changement de rôle et réinitialisation de mot de passe. Plus besoin de
+          passer par la ligne de commande.
+        </p>
+        <UsersPanel initial={accounts} me={user.username} />
+      </section>
+
+      {/* -------------------------------------------------- avancement détaillé */}
+      <section>
+        <h2 className="mb-3 text-lg font-semibold">Avancement par section</h2>
+        <div className="card divide-y divide-[#f0efe9]">
+          {parSection.map((section) => (
+            <div key={section.sectionId} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 text-sm">
+              <Link
+                href={`/formulaire/${section.sectionId}`}
+                className="min-w-0 flex-1 truncate text-sobs-700 underline underline-offset-2"
+              >
+                {section.number} · {section.title}
+              </Link>
+              <span className="text-ink/60">
+                {section.answered}/{section.total}
+              </span>
+              {section.priorityTotal > 0 && (
+                <span className="text-xs text-ink/45">
+                  {section.priorityAnswered}/{section.priorityTotal} prioritaires
+                </span>
+              )}
+              {section.flagged > 0 && (
+                <span className="text-xs text-amber-700">{section.flagged} à revoir</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------- suivi */}
       <section className="grid gap-6 lg:grid-cols-2">
         <div>
           <h2 className="mb-3 text-lg font-semibold">Dernières modifications</h2>
@@ -96,7 +202,7 @@ export default async function AdminPage() {
               Prioritaires sans réponse{' '}
               <span className="font-normal text-ink/45">({missingPriority.length})</span>
             </h2>
-            <ul className="card divide-y divide-[#f0efe9] max-h-80 overflow-y-auto">
+            <ul className="card max-h-80 divide-y divide-[#f0efe9] overflow-y-auto">
               {missingPriority.map((q) => (
                 <li key={q.id} className="px-4 py-2 text-sm">
                   <Link
@@ -113,37 +219,14 @@ export default async function AdminPage() {
         </div>
       </section>
 
+      {/* ------------------------------------------------------------ réponses */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Toutes les réponses</h2>
-        <div className="space-y-6">
-          {sections.map((section) => (
-            <div key={section.id}>
-              <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-ink/45">
-                {section.number} · {section.title}
-              </h3>
-              <div className="card divide-y divide-[#f0efe9]">
-                {questions
-                  .filter((q) => q.sectionId === section.id)
-                  .map((q) => {
-                    const answer = stored[q.id];
-                    return (
-                      <div key={q.id} className="px-4 py-3 text-sm">
-                        <p className="font-medium">
-                          <span className="mr-1.5 text-sobs-600">{q.id}.</span>
-                          {q.label}
-                        </p>
-                        {answer && answer.value.trim() !== '' ? (
-                          <p className="mt-1 whitespace-pre-wrap text-ink/75">{answer.value}</p>
-                        ) : (
-                          <p className="mt-1 italic text-ink/35">Sans réponse</p>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          ))}
-        </div>
+        <h2 className="mb-1 text-lg font-semibold">Toutes les réponses</h2>
+        <p className="mb-3 text-sm text-ink/55">
+          {questions.length} questions. « Corriger » ouvre la question dans le formulaire : la
+          modification y est enregistrée automatiquement, quel que soit l'auteur d'origine.
+        </p>
+        <AdminAnswers rows={rows} />
       </section>
     </div>
   );

@@ -12,23 +12,23 @@ test('les 35 établissements du fichier Excel sont présents, numérotés de 1 �
   );
 });
 
-test('24 établissements sont marqués comme visités, 11 restent à faire', () => {
-  assert.equal(establishments.filter((e) => e.visite).length, 24);
-  assert.equal(establishments.filter((e) => !e.visite).length, 11);
+test('la nouvelle grille marque les 35 établissements comme visités', () => {
+  assert.equal(establishments.filter((e) => e.visite).length, 35);
+  assert.equal(establishments.filter((e) => !e.visite).length, 0);
 });
 
-test('les Almadies comptent 5 établissements, tous non visités', () => {
+test('les Almadies comptent 5 établissements, désormais tous visités', () => {
   const almadies = establishments.filter((e) => e.zone === 'Almadies');
   assert.equal(almadies.length, 5);
-  assert.equal(almadies.filter((e) => e.visite).length, 0);
+  assert.equal(almadies.filter((e) => e.visite).length, 5);
 });
 
 test('synthèse vide : aucun équipement, couverture des visites inchangée', () => {
   const s = computeSynthese({});
   assert.equal(s.totalEtablissements, 35);
-  assert.equal(s.visites, 24);
-  assert.equal(s.restants, 11);
-  assert.equal(s.tauxCouverture, 69);
+  assert.equal(s.visites, 35);
+  assert.equal(s.restants, 0);
+  assert.equal(s.tauxCouverture, 100);
   assert.equal(s.lignesRenseignees, 0);
   for (const eq of s.equipements) {
     assert.equal(eq.oui, 0);
@@ -77,7 +77,7 @@ test('la couverture par zone additionne bien les établissements', () => {
   const total = s.zones.reduce((sum, z) => sum + z.identifies, 0);
   assert.equal(total, 35);
   const almadies = s.zones.find((z) => z.zone === 'Almadies')!;
-  assert.equal(almadies.visites, 0);
+  assert.equal(almadies.visites, 5);
 });
 
 test('hasAnyValue ignore les chaînes blanches', () => {
@@ -92,10 +92,10 @@ test('les colonnes de la grille reprennent les listes de valeurs du fichier Exce
   assert.deepEqual(allowedValues(gridColumnByKey('enseigne')!), ['O', 'N']);
   assert.deepEqual(allowedValues(gridColumnByKey('note')!), ['0', '1', '2', '3', '4', '5']);
   assert.equal(allowedValues(gridColumnByKey('commentaire')!), null);
+  // « Non visité » a disparu de la liste déroulante : les 35 sont visités.
   assert.deepEqual(allowedValues(gridColumnByKey('fiabilite')!), [
     'Souvenir précis',
     'Estimation',
     'À vérifier sur place',
-    'Non visité',
   ]);
 });

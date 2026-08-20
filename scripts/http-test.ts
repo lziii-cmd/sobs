@@ -72,18 +72,20 @@ async function main() {
   ok('accueil accessible une fois connectée');
 
   // --- Enregistrement d'une réponse ----------------------------------------
+  // Q130 en v2 : « Dans combien des 35 établissements as-tu vu Heineken ? ».
+  const QUESTION = 'Q130';
   const value = `Réponse de test — l’Océanium, « Gazelle » ${Date.now()}`;
   const save = await fetch(`${BASE}/api/answers`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', cookie: cookie! },
-    body: JSON.stringify({ questionId: 'Q42', value }),
+    body: JSON.stringify({ questionId: QUESTION, value }),
   });
   assert.equal(save.status, 200);
   ok('réponse enregistrée par l’API');
 
   const section = await fetch(`${BASE}/formulaire/concurrence`, { headers: { cookie: cookie! } });
   const sectionHtml = await section.text();
-  assert.ok(sectionHtml.includes('Q42'), 'la question Q42 devrait être affichée');
+  assert.ok(sectionHtml.includes(QUESTION), `la question ${QUESTION} devrait être affichée`);
   assert.ok(
     sectionHtml.includes(value.replace(/’/g, '’').slice(0, 30)),
     'la réponse enregistrée devrait être rechargée dans la page',
@@ -165,6 +167,88 @@ async function main() {
   assert.equal(contributorOnAdmin.status, 404);
   ok('page admin visible par l’admin, introuvable pour la contributrice');
 
+  // --- Back-office : gestion des comptes -----------------------------------
+  const adminJson = (path: string, init: RequestInit = {}) =>
+    fetch(`${BASE}${path}`, {
+      ...init,
+      headers: {
+        ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+        cookie: adminCookie!,
+      },
+    });
+
+  const usersRefused = await fetch(`${BASE}/api/admin/users`, { headers: { cookie: cookie! } });
+  assert.equal(usersRefused.status, 403);
+  ok('gestion des comptes refusée à la contributrice');
+
+  const usersList = await adminJson('/api/admin/users');
+  assert.equal(usersList.status, 200);
+  const listed = (await usersList.json()).accounts as { username: string; role: string }[];
+  assert.ok(listed.some((a) => a.username === 'http-nourah' && a.role === 'contributor'));
+  ok(`liste des comptes lue (${listed.length} compte(s))`);
+
+  const faible = await adminJson('/api/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({ username: 'http-temp', password: 'court', role: 'contributor' }),
+  });
+  assert.equal(faible.status, 400);
+
+  const mauvaisNom = await adminJson('/api/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({ username: 'nom invalide', password: 'motdepasse-1234', role: 'contributor' }),
+  });
+  assert.equal(mauvaisNom.status, 400);
+  ok('mot de passe trop court et identifiant invalide rejetés');
+
+  const cree = await adminJson('/api/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({ username: 'http-temp', password: 'motdepasse-1234', role: 'contributor' }),
+  });
+  assert.equal(cree.status, 200);
+  assert.equal((await cree.json()).created, true);
+  assert.ok(await login('http-temp', 'motdepasse-1234'), 'le compte créé doit pouvoir se connecter');
+  ok('compte créé depuis le back-office, connexion vérifiée');
+
+  const reinit = await adminJson('/api/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({ username: 'http-temp', password: 'nouveau-motdepasse', role: 'contributor' }),
+  });
+  assert.equal((await reinit.json()).created, false);
+  assert.equal(await login('http-temp', 'motdepasse-1234'), null, 'ancien mot de passe encore valide');
+  assert.ok(await login('http-temp', 'nouveau-motdepasse'));
+  ok('mot de passe réinitialisé, l’ancien ne fonctionne plus');
+
+  const promu = await adminJson('/api/admin/users', {
+    method: 'PATCH',
+    body: JSON.stringify({ username: 'http-temp', role: 'admin' }),
+  });
+  assert.equal(promu.status, 200);
+
+  const renomme = await adminJson('/api/admin/users', {
+    method: 'PATCH',
+    body: JSON.stringify({ username: 'http-temp', newUsername: 'http-temp2' }),
+  });
+  assert.equal(renomme.status, 200);
+  assert.ok(await login('http-temp2', 'nouveau-motdepasse'), 'le compte renommé doit pouvoir se connecter');
+  assert.equal(await login('http-temp', 'nouveau-motdepasse'), null, 'ancien identifiant encore actif');
+  ok('rôle changé puis compte renommé');
+
+  const collision = await adminJson('/api/admin/users', {
+    method: 'PATCH',
+    body: JSON.stringify({ username: 'http-temp2', newUsername: 'http-nourah' }),
+  });
+  assert.equal(collision.status, 409);
+  ok('renommage vers un identifiant déjà pris refusé');
+
+  const suicide = await adminJson('/api/admin/users?username=http-admin', { method: 'DELETE' });
+  assert.equal(suicide.status, 409);
+  ok('suppression de son propre compte refusée');
+
+  const supprime = await adminJson('/api/admin/users?username=http-temp2', { method: 'DELETE' });
+  assert.equal(supprime.status, 200);
+  assert.equal(await login('http-temp2', 'nouveau-motdepasse'), null);
+  ok('compte supprimé, connexion impossible ensuite');
+
   // --- Déconnexion ----------------------------------------------------------
   const logout = await fetch(`${BASE}/api/logout`, { method: 'POST', headers: { cookie: cookie! } });
   assert.equal(logout.status, 200);
@@ -172,10 +256,10 @@ async function main() {
 
   // Nettoyage.
   await fetch(`${BASE}/api/files/${uploaded.id}`, { method: 'DELETE', headers: { cookie: adminCookie! } });
-  await sql`DELETE FROM answers WHERE question_id = 'Q42'`;
-  await sql`DELETE FROM answer_revisions WHERE question_id = 'Q42'`;
+  await sql`DELETE FROM answers WHERE question_id = ${QUESTION}`;
+  await sql`DELETE FROM answer_revisions WHERE question_id = ${QUESTION}`;
   await sql`DELETE FROM grid_rows WHERE num = 20`;
-  await sql`DELETE FROM users WHERE username IN ('http-admin', 'http-nourah')`;
+  await sql`DELETE FROM users WHERE username IN ('http-admin', 'http-nourah', 'http-temp', 'http-temp2')`;
 
   console.log('\nTous les tests HTTP passent.');
   process.exit(0);

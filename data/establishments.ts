@@ -1,6 +1,9 @@
 /**
  * Les 35 établissements du circuit CHR de Dakar, repris à l'identique de
  * `Grille_releve_CHR_SOBOA.xlsx` (onglet « Grille »).
+ * Depuis la mise à jour de la grille, les 35 sont marqués visités : la colonne
+ * « Visité » du fichier vaut Oui sur les 35 lignes, et l'onglet « Synthèse »
+ * annonce une couverture complète du périmètre identifié.
  * Ces colonnes sont des colonnes d'identification : elles ne se saisissent pas dans le site.
  */
 
@@ -43,15 +46,15 @@ export const establishments: Establishment[] = [
   { num: 22, nom: 'Trattoria Da Alex', type: 'R', zone: 'Point E', visite: true },
   { num: 23, nom: "Jardin de l'Amitié", type: 'Pub', zone: 'Amitié', visite: true },
   { num: 24, nom: 'Bazoff', type: 'Pub', zone: 'Amitié', visite: true },
-  { num: 25, nom: "L'Héritage (av. Bourguiba)", type: 'R', zone: 'Ville', visite: false },
-  { num: 26, nom: 'Favélas', type: 'R', zone: 'Point E', visite: false },
-  { num: 27, nom: 'Bahia Beach Club', type: 'R', zone: 'Almadies', visite: false },
-  { num: 28, nom: 'Le Carré', type: 'R', zone: 'Almadies', visite: false },
-  { num: 29, nom: 'La Cabane du Pêcheur', type: 'R', zone: 'Almadies', visite: false },
-  { num: 30, nom: "Sharky's", type: 'R', zone: 'Almadies', visite: false },
-  { num: 31, nom: "Jardin d'Orient", type: 'R', zone: 'Almadies', visite: false },
-  { num: 32, nom: 'Le Tandem', type: 'R', zone: 'Yoff', visite: false },
-  { num: 33, nom: 'Chez Fatou', type: 'R', zone: 'À localiser', visite: false },
-  { num: 34, nom: 'Club Olympique', type: 'R', zone: 'À localiser', visite: false },
-  { num: 35, nom: "L'Adresse", type: 'R', zone: 'À localiser', visite: false },
+  { num: 25, nom: "L'Héritage (av. Bourguiba)", type: 'R', zone: 'Ville', visite: true },
+  { num: 26, nom: 'Favélas', type: 'R', zone: 'Point E', visite: true },
+  { num: 27, nom: 'Bahia Beach Club', type: 'R', zone: 'Almadies', visite: true },
+  { num: 28, nom: 'Le Carré', type: 'R', zone: 'Almadies', visite: true },
+  { num: 29, nom: 'La Cabane du Pêcheur', type: 'R', zone: 'Almadies', visite: true },
+  { num: 30, nom: "Sharky's", type: 'R', zone: 'Almadies', visite: true },
+  { num: 31, nom: "Jardin d'Orient", type: 'R', zone: 'Almadies', visite: true },
+  { num: 32, nom: 'Le Tandem', type: 'R', zone: 'Yoff', visite: true },
+  { num: 33, nom: 'Chez Fatou', type: 'R', zone: 'À localiser', visite: true },
+  { num: 34, nom: 'Club Olympique', type: 'R', zone: 'À localiser', visite: true },
+  { num: 35, nom: "L'Adresse", type: 'R', zone: 'À localiser', visite: true },
 ];

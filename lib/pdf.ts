@@ -177,9 +177,21 @@ export async function buildPdf(input: PdfInput): Promise<Uint8Array> {
       color: GREY,
     });
   }
+  doc.gap(10);
+  doc.write(
+    'Seules les questions ayant reçu une réponse figurent dans ce document. Les questions restées vides, et les sections entièrement vides, ne sont pas reprises.',
+    { size: 9, font: 'oblique', color: GREY },
+  );
 
   // ----------------------------------------------------------------- réponses
+  // Le PDF ne reprend que les questions auxquelles il a été répondu : une
+  // section sans aucune réponse n'apparaît pas, et un groupe non renseigné non plus.
   for (const section of sections) {
+    const repondues = questions.filter(
+      (q) => q.sectionId === section.id && answerText(input.answers[q.id]) !== '',
+    );
+    if (repondues.length === 0) continue;
+
     doc.addPage();
     doc.write(`${section.number}  ${section.title}`, { size: 16, font: 'bold', color: GREEN });
     doc.gap(4);
@@ -189,7 +201,7 @@ export async function buildPdf(input: PdfInput): Promise<Uint8Array> {
     doc.gap(6);
 
     let currentGroup: string | undefined;
-    for (const question of questions.filter((q) => q.sectionId === section.id)) {
+    for (const question of repondues) {
       if (question.group && question.group !== currentGroup) {
         currentGroup = question.group;
         doc.ensure(40);
@@ -210,18 +222,14 @@ export async function buildPdf(input: PdfInput): Promise<Uint8Array> {
       });
       doc.gap(2);
 
-      if (value === '') {
-        doc.write('Sans réponse', { size: 10, font: 'oblique', color: GREY, indent: 14 });
-      } else {
-        doc.write(value, { size: 10, indent: 14 });
-        const meta: string[] = [];
-        if (answer?.updatedAt) meta.push(`mise à jour le ${formatDateFr(answer.updatedAt)}`);
-        if (answer?.revisions && answer.revisions > 1) meta.push(`${answer.revisions} versions`);
-        if (answer?.flagged) meta.push('à revenir dessus');
-        if (meta.length) {
-          doc.gap(1);
-          doc.write(meta.join(' · '), { size: 7.5, color: GREY, indent: 14 });
-        }
+      doc.write(value, { size: 10, indent: 14 });
+      const meta: string[] = [];
+      if (answer?.updatedAt) meta.push(`mise à jour le ${formatDateFr(answer.updatedAt)}`);
+      if (answer?.revisions && answer.revisions > 1) meta.push(`${answer.revisions} versions`);
+      if (answer?.flagged) meta.push('à revenir dessus');
+      if (meta.length) {
+        doc.gap(1);
+        doc.write(meta.join(' · '), { size: 7.5, color: GREY, indent: 14 });
       }
       doc.gap(9);
     }

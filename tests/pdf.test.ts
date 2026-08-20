@@ -52,7 +52,38 @@ test('le PDF se génère même sans aucune réponse', async () => {
   const bytes = await buildPdf({ answers: {}, grid: {} });
   assert.ok(bytes.length > 1000);
   const doc = await PDFDocument.load(bytes);
-  assert.ok(doc.getPageCount() >= 8, `${doc.getPageCount()} pages`);
+  // Sans réponse, il ne reste que la page de garde, la grille et la synthèse :
+  // aucune section de questions n'est imprimée.
+  assert.ok(doc.getPageCount() >= 3, `${doc.getPageCount()} pages`);
+});
+
+test('seules les questions répondues sont imprimées', async () => {
+  const vide = await buildPdf({ answers: {}, grid: {} });
+  const pagesVides = (await PDFDocument.load(vide)).getPageCount();
+
+  const uneReponse = await buildPdf({
+    answers: { Q1: { value: 'Nourah Abdou' } },
+    grid: {},
+  });
+  const pagesUneReponse = (await PDFDocument.load(uneReponse)).getPageCount();
+
+  // Une seule réponse ouvre exactement une section : la première.
+  assert.equal(pagesUneReponse, pagesVides + 1, 'une réponse doit ajouter une seule page de section');
+});
+
+test('une section sans aucune réponse n’apparaît pas dans le PDF', async () => {
+  const bilan = questions.filter((q) => q.sectionId === 'bilan');
+  const answers = Object.fromEntries(bilan.map((q) => [q.id, { value: 'réponse' }]));
+
+  const bytes = await buildPdf({ answers, grid: {} });
+  const pages = (await PDFDocument.load(bytes)).getPageCount();
+
+  const vide = await buildPdf({ answers: {}, grid: {} });
+  const pagesVides = (await PDFDocument.load(vide)).getPageCount();
+
+  // 12 réponses d'une seule section : une poignée de pages en plus, pas les 10 sections.
+  assert.ok(pages > pagesVides, 'la section répondue doit apparaître');
+  assert.ok(pages < pagesVides + 10, `${pages} pages : des sections vides ont été imprimées`);
 });
 
 test('le PDF contient toutes les réponses saisies, y compris les très longues', async () => {
@@ -76,6 +107,14 @@ test('le PDF contient toutes les réponses saisies, y compris les très longues'
   const bytes = await buildPdf({ answers, grid });
   const doc = await PDFDocument.load(bytes);
   assert.ok(doc.getPageCount() > 10);
+});
+
+test('le PDF complet couvre les 10 sections quand tout est répondu', async () => {
+  const answers = Object.fromEntries(questions.map((q) => [q.id, { value: 'réponse courte' }]));
+  const bytes = await buildPdf({ answers, grid: {} });
+  const doc = await PDFDocument.load(bytes);
+  // Page de garde + au moins une page par section + grille + synthèse.
+  assert.ok(doc.getPageCount() >= 1 + sections.length + 2, `${doc.getPageCount()} pages`);
 });
 
 test('aucun caractère du PDF ne se dégrade en « ? »', async () => {

@@ -14,13 +14,13 @@ test('avancement global à zéro quand rien n’est saisi', () => {
   const progress = globalProgress({});
   assert.equal(progress.answered, 0);
   assert.equal(progress.percent, 0);
-  assert.equal(progress.total, 85);
+  assert.equal(progress.total, 196);
 });
 
 test('avancement global à 100 % quand tout est saisi', () => {
   const answers = Object.fromEntries(questions.map((q) => [q.id, { value: 'réponse' }]));
   const progress = globalProgress(answers);
-  assert.equal(progress.answered, 85);
+  assert.equal(progress.answered, 196);
   assert.equal(progress.percent, 100);
   assert.equal(progress.priorityAnswered, progress.priorityTotal);
 });
@@ -51,6 +51,6 @@ test('la somme des sections égale le total global', () => {
   const sections = allProgress({});
   assert.equal(
     sections.reduce((sum, s) => sum + s.total, 0),
-    85,
+    196,
   );
 });

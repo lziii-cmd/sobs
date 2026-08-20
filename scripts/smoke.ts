@@ -57,7 +57,7 @@ async function main() {
   // --- Réponses + historique ------------------------------------------------
   await upsertAnswer(sql, 'Q1', 'Nourah Abdou', 'smoke-nourah');
   await upsertAnswer(sql, 'Q1', 'Nourah Abdou Diallo', 'smoke-nourah'); // modification
-  await upsertAnswer(sql, 'Q42', 'Heineken à peu près partout, Coca dans la moitié', 'smoke-nourah');
+  await upsertAnswer(sql, 'Q130', 'Heineken à peu près partout, Coca dans la moitié', 'smoke-nourah');
 
   const answers = await loadAnswers();
   assert.equal(answers.Q1.value, 'Nourah Abdou Diallo');
@@ -76,8 +76,8 @@ async function main() {
   ok('effacer une réponse ne détruit pas son historique');
 
   // --- Marquage « à revoir » ------------------------------------------------
-  await sql`UPDATE answers SET flagged = true WHERE question_id = ${'Q42'}`;
-  assert.equal((await loadAnswers()).Q42.flagged, true);
+  await sql`UPDATE answers SET flagged = true WHERE question_id = ${'Q130'}`;
+  assert.equal((await loadAnswers()).Q130.flagged, true);
   ok('marquage « à revoir » persistant');
 
   // --- Grille + upsert par cellule ------------------------------------------
@@ -118,7 +118,9 @@ async function main() {
     grid: await loadGrid(),
   });
   const doc = await PDFDocument.load(pdf);
-  assert.ok(doc.getPageCount() >= 8);
+  // Le PDF ne reprend que les questions répondues : avec une seule réponse en
+  // base, il reste la page de garde, une section, la grille et la synthèse.
+  assert.ok(doc.getPageCount() >= 3, `${doc.getPageCount()} pages`);
   ok(`PDF généré sur données réelles (${doc.getPageCount()} pages)`);
 
   // Nettoyage.

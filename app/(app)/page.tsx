@@ -100,9 +100,13 @@ export default async function HomePage() {
                   <div className="h-full rounded-full bg-sobs-500" style={{ width: `${percent}%` }} />
                 </div>
                 <p className="mt-2 text-xs text-ink/50">
-                  {section.priorityTotal - section.priorityAnswered === 0
-                    ? 'Toutes les prioritaires sont traitées'
-                    : `${section.priorityTotal - section.priorityAnswered} prioritaire(s) restante(s)`}
+                  {/* La section « établissements » ne marque aucune question
+                      individuellement : la dire « toute traitée » serait faux. */}
+                  {section.priorityTotal === 0
+                    ? 'Aucune question marquée individuellement'
+                    : section.priorityTotal - section.priorityAnswered === 0
+                      ? 'Toutes les prioritaires sont traitées'
+                      : `${section.priorityTotal - section.priorityAnswered} prioritaire(s) restante(s)`}
                   {section.flagged > 0 && ` · ${section.flagged} à revoir`}
                 </p>
               </Link>

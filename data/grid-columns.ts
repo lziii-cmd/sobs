@@ -17,12 +17,12 @@ export type GridColumn = {
   width: number;
 };
 
-export const FIABILITE_OPTIONS = [
-  'Souvenir précis',
-  'Estimation',
-  'À vérifier sur place',
-  'Non visité',
-];
+/**
+ * Liste déroulante de la colonne « Fiabilité », reprise de la validation de
+ * données du fichier Excel. L'option « Non visité » a disparu de la nouvelle
+ * grille : les 35 établissements y sont tous marqués visités.
+ */
+export const FIABILITE_OPTIONS = ['Souvenir précis', 'Estimation', 'À vérifier sur place'];
 
 export const gridColumns: GridColumn[] = [
   {
