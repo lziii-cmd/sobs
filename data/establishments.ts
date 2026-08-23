@@ -54,7 +54,7 @@ export const establishments: Establishment[] = [
   { num: 30, nom: "Sharky's", type: 'R', zone: 'Almadies', visite: true },
   { num: 31, nom: "Jardin d'Orient", type: 'R', zone: 'Almadies', visite: true },
   { num: 32, nom: 'Le Tandem', type: 'R', zone: 'Yoff', visite: true },
-  { num: 33, nom: 'Chez Fatou', type: 'R', zone: 'À localiser', visite: true },
-  { num: 34, nom: 'Club Olympique', type: 'R', zone: 'À localiser', visite: true },
-  { num: 35, nom: "L'Adresse", type: 'R', zone: 'À localiser', visite: true },
+  { num: 33, nom: 'Chez Fatou', type: 'R', zone: 'Almadies', visite: true },
+  { num: 34, nom: 'Club Olympique', type: 'R', zone: 'Mermoz', visite: true },
+  { num: 35, nom: "L'Adresse", type: 'R', zone: 'Almadies', visite: true },
 ];

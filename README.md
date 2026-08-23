@@ -1,10 +1,10 @@
-# SOBS — Formulaire de collecte SOBOA
+# SOBS — Questionnaire de collecte SOBOA
 
-Site privé à deux comptes pour collecter, au fil de l'eau, les réponses au formulaire du rapport de
-stage SOBOA, remplir la grille de relevé des 35 établissements CHR de Dakar, échanger des fichiers,
+Site privé à deux comptes pour collecter, au fil de l'eau, les réponses au questionnaire de l'étude
+SOBOA, remplir la grille de relevé des 35 établissements CHR de Dakar, échanger des fichiers,
 et exporter l'ensemble en PDF (`question : réponse`).
 
-- **196 questions** réparties en 10 sections, sauvegarde automatique à la frappe
+- **97 questions** réparties en 7 sections, sauvegarde automatique à la frappe
 - **Historique des versions** : chaque modification d'une réponse est conservée
 - **Grille de relevé** 35 établissements × 13 colonnes, sauvegarde cellule par cellule
 - **Synthèse** recalculée en direct à partir de la grille
@@ -43,25 +43,35 @@ Ensuite, tout se fait depuis la page **Administration** du site : créer un comp
 changer son rôle, réinitialiser un mot de passe, le supprimer. Le dernier compte d'administration
 ne peut être ni rétrogradé ni supprimé, pour ne pas se retrouver enfermé dehors.
 
-## Passage du formulaire v1 au questionnaire v2
+## Changements de questionnaire
 
-Le questionnaire est passé de 85 à 196 questions, avec une numérotation entièrement différente.
-Les réponses déjà saisies sont conservées et remises sous leur nouveau numéro :
+Le document source a changé deux fois. Chaque passage renumérote tout : sans migration, une réponse
+enregistrée sous `Q42` se retrouverait affichée sous une question sans rapport.
+
+| Document | Questions | Sections | Archive en base |
+|----------|-----------|----------|-----------------|
+| Formulaire v1 | 85 | 7 | `answers_v1`, `answer_revisions_v1` |
+| Questionnaire v2 | 196 | 10 | `answers_v2`, `answer_revisions_v2` |
+| `Questionnaire_etude_SOBOA.docx` (actuel) | 97 | 7 | — |
+
+Le questionnaire actuel n'est pas une révision du précédent : il lui succède. Son mode d'emploi
+l'annonce — il fait suite à une base de connaissances qui recense ce qui est déjà établi, et « les
+questions déjà résolues n'y figurent donc pas ». La plupart des réponses déjà saisies ont servi à
+constituer cette base : elles n'ont plus de question d'accueil, et restent en archive.
 
 ```bash
-npm run db:migrate-v2            # simulation : affiche ce qui serait fait, n'écrit rien
-npm run db:migrate-v2 -- --apply # applique
+npm run db:migrate-etude            # simulation : affiche ce qui serait fait, n'écrit rien
+npm run db:migrate-etude -- --apply # applique
 ```
 
-L'application archive d'abord l'intégralité de l'existant dans `answers_v1` et
-`answer_revisions_v1`, y compris les réponses sans équivalent en v2. La table de correspondance,
-établie intitulé par intitulé, est dans `data/migration-v1.ts`. Le script refuse de s'exécuter
-deux fois.
+Le script archive d'abord l'intégralité de l'existant, y compris ce qui n'est pas repris, puis
+réécrit les identifiants. La table de correspondance, établie intitulé par intitulé, est dans
+`data/migration-v2.ts`, avec la raison de chaque abandon. Le script refuse de s'exécuter deux fois.
 
 ## Tests
 
 ```bash
-npm test          # tests unitaires : questions, correspondance v1/v2, comptes, avancement, synthèse, PDF
+npm test          # tests unitaires : questions, correspondance des numérotations, comptes, avancement, synthèse, PDF
 npm run smoke     # bout en bout contre la vraie base (persistance, historique, PDF)
 npm run test:http # bout en bout HTTP, serveur lancé (auth, autosave, grille, fichiers, comptes, export)
 ```

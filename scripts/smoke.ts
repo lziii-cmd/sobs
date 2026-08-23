@@ -55,12 +55,12 @@ async function main() {
   ok('authentification : bon mot de passe accepté, mauvais refusé');
 
   // --- Réponses + historique ------------------------------------------------
-  await upsertAnswer(sql, 'Q1', 'Nourah Abdou', 'smoke-nourah');
-  await upsertAnswer(sql, 'Q1', 'Nourah Abdou Diallo', 'smoke-nourah'); // modification
-  await upsertAnswer(sql, 'Q130', 'Heineken à peu près partout, Coca dans la moitié', 'smoke-nourah');
+  await upsertAnswer(sql, 'Q1', 'Manque de place, sans certitude', 'smoke-nourah');
+  await upsertAnswer(sql, 'Q1', 'Manque de place, et un refus du gérant', 'smoke-nourah'); // modification
+  await upsertAnswer(sql, 'Q19', 'Heineken à peu près partout, Coca dans la moitié', 'smoke-nourah');
 
   const answers = await loadAnswers();
-  assert.equal(answers.Q1.value, 'Nourah Abdou Diallo');
+  assert.equal(answers.Q1.value, 'Manque de place, et un refus du gérant');
   assert.equal(answers.Q1.revisions, 2, 'les deux versions doivent être conservées');
   assert.ok(answers.Q1.updatedAt, 'date de mise à jour absente');
   ok('réponse enregistrée, modifiée, et son historique conservé');
@@ -76,8 +76,8 @@ async function main() {
   ok('effacer une réponse ne détruit pas son historique');
 
   // --- Marquage « à revoir » ------------------------------------------------
-  await sql`UPDATE answers SET flagged = true WHERE question_id = ${'Q130'}`;
-  assert.equal((await loadAnswers()).Q130.flagged, true);
+  await sql`UPDATE answers SET flagged = true WHERE question_id = ${'Q19'}`;
+  assert.equal((await loadAnswers()).Q19.flagged, true);
   ok('marquage « à revoir » persistant');
 
   // --- Grille + upsert par cellule ------------------------------------------

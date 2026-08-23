@@ -146,6 +146,11 @@ export default function QuestionField({
 
       {question.help && <p className="mt-1.5 text-sm text-ink/55">{question.help}</p>}
 
+      {/* Renvoi du document source : le chapitre de l'étude que la réponse alimente. */}
+      {question.chapter && (
+        <p className="mt-1 text-xs text-ink/40">→ {question.chapter}</p>
+      )}
+
       <div className="mt-3">
         {question.type === 'short' && (
           <input className="field" value={value} onChange={(e) => update(e.target.value)} />

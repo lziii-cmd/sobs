@@ -72,8 +72,8 @@ test('seules les questions répondues sont imprimées', async () => {
 });
 
 test('une section sans aucune réponse n’apparaît pas dans le PDF', async () => {
-  const bilan = questions.filter((q) => q.sectionId === 'bilan');
-  const answers = Object.fromEntries(bilan.map((q) => [q.id, { value: 'réponse' }]));
+  const economie = questions.filter((q) => q.sectionId === 'economie');
+  const answers = Object.fromEntries(economie.map((q) => [q.id, { value: 'réponse' }]));
 
   const bytes = await buildPdf({ answers, grid: {} });
   const pages = (await PDFDocument.load(bytes)).getPageCount();
@@ -81,9 +81,9 @@ test('une section sans aucune réponse n’apparaît pas dans le PDF', async () 
   const vide = await buildPdf({ answers: {}, grid: {} });
   const pagesVides = (await PDFDocument.load(vide)).getPageCount();
 
-  // 12 réponses d'une seule section : une poignée de pages en plus, pas les 10 sections.
+  // Les réponses d'une seule section : une poignée de pages en plus, pas les 7 sections.
   assert.ok(pages > pagesVides, 'la section répondue doit apparaître');
-  assert.ok(pages < pagesVides + 10, `${pages} pages : des sections vides ont été imprimées`);
+  assert.ok(pages < pagesVides + 7, `${pages} pages : des sections vides ont été imprimées`);
 });
 
 test('le PDF contient toutes les réponses saisies, y compris les très longues', async () => {
@@ -109,7 +109,7 @@ test('le PDF contient toutes les réponses saisies, y compris les très longues'
   assert.ok(doc.getPageCount() > 10);
 });
 
-test('le PDF complet couvre les 10 sections quand tout est répondu', async () => {
+test('le PDF complet couvre les 7 sections quand tout est répondu', async () => {
   const answers = Object.fromEntries(questions.map((q) => [q.id, { value: 'réponse courte' }]));
   const bytes = await buildPdf({ answers, grid: {} });
   const doc = await PDFDocument.load(bytes);

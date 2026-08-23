@@ -1,34 +1,30 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { questions, sections, questionById } from '../data/questions';
+import { groupIntro, groups, questionById, questions, sections } from '../data/questions';
 
 /**
- * Le tableau « Récapitulatif des sections » de `Questionnaire_SOBOA_v2.docx`
- * donne, pour chaque section, le nombre de questions et le nombre de
- * prioritaires. C'est la meilleure vérification disponible de la transposition :
- * si un intitulé avait été oublié ou dupliqué, ces comptes ne tomberaient pas juste.
+ * Le tableau « Récapitulatif » de `Questionnaire_etude_SOBOA.docx` donne le
+ * compte attendu par section. Il sert ici de contrôle : si la transposition
+ * dérive, ces chiffres ne tombent plus.
  */
 const RECAPITULATIF = [
-  { id: 'cadre', questions: 23, prioritaires: 14 },
-  { id: 'entreprise', questions: 23, prioritaires: 11 },
-  { id: 'marche', questions: 12, prioritaires: 6 },
-  { id: 'visites', questions: 19, prioritaires: 14 },
-  { id: 'etablissements', questions: 35, prioritaires: 0 },
-  { id: 'visibilite', questions: 17, prioritaires: 12 },
-  { id: 'concurrence', questions: 19, prioritaires: 13 },
-  { id: 'implantation', questions: 12, prioritaires: 7 },
-  { id: 'businesscase', questions: 24, prioritaires: 19 },
-  { id: 'bilan', questions: 12, prioritaires: 6 },
+  { id: 'gamme', number: '1', questions: 10, prioritaires: 7 },
+  { id: 'equipement', number: '2', questions: 8, prioritaires: 5 },
+  { id: 'concurrence', number: '3', questions: 10, prioritaires: 7 },
+  { id: 'etablissements', number: '4', questions: 36, prioritaires: 1 },
+  { id: 'marche', number: '5', questions: 9, prioritaires: 5 },
+  { id: 'entreprise', number: '6', questions: 11, prioritaires: 8 },
+  { id: 'economie', number: '7', questions: 13, prioritaires: 10 },
 ];
 
-test('le formulaire contient bien les 196 questions du document source', () => {
-  assert.equal(questions.length, 196);
+test('le questionnaire contient bien les 97 questions du document source', () => {
+  assert.equal(questions.length, 97);
 });
 
-test('les identifiants vont de Q1 à Q196, sans trou ni doublon', () => {
+test('les identifiants vont de Q1 à Q97, sans trou ni doublon', () => {
   const ids = questions.map((q) => q.id);
   assert.equal(new Set(ids).size, ids.length, 'identifiants en double');
-  for (let n = 1; n <= 196; n += 1) {
+  for (let n = 1; n <= 97; n += 1) {
     assert.ok(ids.includes(`Q${n}`), `Q${n} manquante`);
   }
 });
@@ -39,15 +35,35 @@ test("l'ordre des questions suit celui du document", () => {
   assert.deepEqual(numbers, sorted);
 });
 
-test('les 10 sections sont celles du document, dans le même ordre', () => {
+test('les 7 sections sont celles du document, dans le même ordre', () => {
   assert.deepEqual(
     sections.map((s) => s.id),
     RECAPITULATIF.map((r) => r.id),
   );
   assert.deepEqual(
     sections.map((s) => s.number),
-    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+    RECAPITULATIF.map((r) => r.number),
   );
+});
+
+test('le compte par section correspond au récapitulatif du document', () => {
+  for (const attendu of RECAPITULATIF) {
+    const liste = questions.filter((q) => q.sectionId === attendu.id);
+    assert.equal(liste.length, attendu.questions, `section ${attendu.number} : mauvais total`);
+    assert.equal(
+      liste.filter((q) => q.priority).length,
+      attendu.prioritaires,
+      `section ${attendu.number} : mauvais nombre de prioritaires`,
+    );
+  }
+});
+
+test('le document annonce 97 questions dont 43 prioritaires', () => {
+  assert.equal(
+    RECAPITULATIF.reduce((total, r) => total + r.questions, 0),
+    97,
+  );
+  assert.equal(questions.filter((q) => q.priority).length, 43);
 });
 
 test('chaque question appartient à une section connue et aucune section n’est vide', () => {
@@ -61,68 +77,73 @@ test('chaque question appartient à une section connue et aucune section n’est
   }
 });
 
-test('le compte par section correspond au récapitulatif du document', () => {
-  for (const attendu of RECAPITULATIF) {
-    const list = questions.filter((q) => q.sectionId === attendu.id);
-    assert.equal(list.length, attendu.questions, `section ${attendu.id} : nombre de questions`);
-    assert.equal(
-      list.filter((q) => q.priority).length,
-      attendu.prioritaires,
-      `section ${attendu.id} : nombre de prioritaires`,
-    );
-  }
-});
-
-test('le document annonce 196 questions dont 102 prioritaires', () => {
-  assert.equal(
-    RECAPITULATIF.reduce((sum, r) => sum + r.questions, 0),
-    196,
-  );
-  assert.equal(questions.filter((q) => q.priority).length, 102);
-});
-
-test('la section « établissements » couvre les 35 points de vente de la grille', () => {
-  const list = questions.filter((q) => q.sectionId === 'etablissements');
-  assert.equal(list.length, 35);
-  assert.equal(list[0].id, 'Q78');
-  assert.equal(list[34].id, 'Q112');
-  // Aucune n'est marquée individuellement : la section entière est prioritaire.
-  assert.equal(list.filter((q) => q.priority).length, 0);
-});
-
-test('les questions à choix ont des options, les autres n’en ont pas', () => {
+test('le questionnaire est entièrement ouvert : aucune case à cocher', () => {
+  // Le document ne conserve plus de question à choix : tout attend un texte.
   for (const question of questions) {
-    if (question.type === 'choice' || question.type === 'multi') {
-      assert.ok(question.options && question.options.length >= 2, `${question.id} sans options`);
-    } else {
-      assert.equal(question.options, undefined, `${question.id} ne devrait pas avoir d'options`);
-    }
-  }
-});
-
-test('les huit questions à cases à cocher du document sont bien typées', () => {
-  const attendu = ['Q4', 'Q7', 'Q8', 'Q9', 'Q10', 'Q13', 'Q32', 'Q36'];
-  const obtenu = questions.filter((q) => q.type === 'choice' || q.type === 'multi').map((q) => q.id);
-  assert.deepEqual(obtenu, attendu);
-
-  for (const id of attendu) {
-    const question = questionById(id);
-    assert.ok(question, `${id} introuvable`);
-    assert.ok(question.options!.length >= 3, `${id} : trop peu d'options`);
+    assert.ok(
+      question.type === 'short' || question.type === 'long',
+      `${question.id} : type inattendu (${question.type})`,
+    );
+    assert.equal(question.options, undefined, `${question.id} ne devrait pas avoir d'options`);
   }
 });
 
 test('les intitulés ne sont ni vides ni tronqués', () => {
   for (const question of questions) {
     assert.ok(question.label.trim().length > 10, `${question.id} : intitulé trop court`);
-    assert.ok(!question.label.includes('PRIORITAIRE'), `${question.id} : marqueur resté dans l'intitulé`);
   }
 });
 
-test('les textes d’aide ne contiennent pas de résidu de mise en forme', () => {
-  for (const question of questions) {
-    if (!question.help) continue;
-    assert.ok(!question.help.includes('☐'), `${question.id} : case à cocher dans l'aide`);
-    assert.ok(!question.help.includes('●'), `${question.id} : puce dans l'aide`);
+test('la section 4 couvre les 35 établissements plus le cas de L’Hibiscus', () => {
+  const releve = questions.filter((q) => q.sectionId === 'etablissements');
+  assert.equal(releve.length, 36);
+
+  const decrites = releve.filter((q) => q.label.startsWith('Décrire les observations'));
+  assert.equal(decrites.length, 35, 'une question de relevé par établissement du périmètre');
+
+  const hibiscus = releve.find((q) => q.label.includes('Hibiscus'));
+  assert.ok(hibiscus, "la question sur L'Hibiscus est absente");
+  assert.equal(hibiscus.id, 'Q64');
+});
+
+test('les questions de relevé sont regroupées par zone', () => {
+  const zones = new Set(
+    questions.filter((q) => q.sectionId === 'etablissements' && q.group).map((q) => q.group),
+  );
+  for (const zone of ['PORT', 'CORNICHE EST', 'VILLE ET PLATEAU', 'ALMADIES', 'MERMOZ']) {
+    assert.ok(zones.has(zone), `zone ${zone} absente du relevé`);
+  }
+});
+
+test('les renvois de chapitre sont repris quand le document en donne un', () => {
+  const avecChapitre = questions.filter((q) => q.chapter);
+  assert.equal(avecChapitre.length, 61);
+  for (const question of avecChapitre) {
+    assert.match(question.chapter!, /^Chapitres? /, `${question.id} : renvoi mal formé`);
+  }
+});
+
+test('les blocs de cadrage du document sont conservés', () => {
+  assert.equal(groups.length, 4);
+  for (const groupe of groups) {
+    assert.ok(groupe.intro.trim().length > 100, `${groupe.name} : bloc trop court`);
+    assert.ok(
+      sections.some((s) => s.id === groupe.sectionId),
+      `${groupe.name} : section inconnue`,
+    );
+  }
+
+  // Le rappel du constat de la section 1 porte la démonstration centrale.
+  const constat = groupIntro('gamme', 'RAPPEL DU CONSTAT');
+  assert.ok(constat?.includes('treize références'));
+  assert.ok(constat?.includes('Gazelle'));
+});
+
+test('les sept premières questions portent le constat fondateur de l’étude', () => {
+  // Le mode d'emploi les désigne comme les plus déterminantes du document.
+  for (let n = 1; n <= 7; n += 1) {
+    const question = questionById(`Q${n}`)!;
+    assert.equal(question.sectionId, 'gamme', `Q${n} hors de la section 1`);
+    assert.equal(question.priority, true, `Q${n} devrait être prioritaire`);
   }
 });

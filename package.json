@@ -10,7 +10,7 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "db:setup": "node --import tsx scripts/setup-db.ts",
     "db:user": "node --import tsx scripts/create-user.ts",
-    "db:migrate-v2": "node --import tsx scripts/migrate-v2.ts",
+    "db:migrate-etude": "node --import tsx scripts/migrate-etude.ts",
     "smoke": "node --import tsx scripts/smoke.ts",
     "test:http": "node --import tsx scripts/http-test.ts"
   },

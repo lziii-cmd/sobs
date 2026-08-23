@@ -214,7 +214,7 @@ export async function buildPdf(input: PdfInput): Promise<Uint8Array> {
       const value = answerText(answer);
 
       doc.ensure(46);
-      // Le rond plein « ● » du document source n'existe pas dans les polices
+      // Le carré plein « ▪ » du document source n'existe pas dans les polices
       // standard du PDF : on garde un marqueur équivalent et lisible.
       doc.write(`${question.id}. ${question.label}${question.priority ? '   · PRIORITAIRE' : ''}`, {
         size: 10,
@@ -224,6 +224,8 @@ export async function buildPdf(input: PdfInput): Promise<Uint8Array> {
 
       doc.write(value, { size: 10, indent: 14 });
       const meta: string[] = [];
+      // Renvoi du document source, utile au moment de replacer la réponse dans l'étude.
+      if (question.chapter) meta.push(question.chapter.toLowerCase());
       if (answer?.updatedAt) meta.push(`mise à jour le ${formatDateFr(answer.updatedAt)}`);
       if (answer?.revisions && answer.revisions > 1) meta.push(`${answer.revisions} versions`);
       if (answer?.flagged) meta.push('à revenir dessus');

@@ -72,8 +72,8 @@ async function main() {
   ok('accueil accessible une fois connectée');
 
   // --- Enregistrement d'une réponse ----------------------------------------
-  // Q130 en v2 : « Dans combien des 35 établissements as-tu vu Heineken ? ».
-  const QUESTION = 'Q130';
+  // Q19 : « Dans combien d'établissements chaque marque concurrente est-elle référencée ? ».
+  const QUESTION = 'Q19';
   const value = `Réponse de test — l’Océanium, « Gazelle » ${Date.now()}`;
   const save = await fetch(`${BASE}/api/answers`, {
     method: 'PATCH',

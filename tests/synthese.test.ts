@@ -17,10 +17,16 @@ test('la nouvelle grille marque les 35 établissements comme visités', () => {
   assert.equal(establishments.filter((e) => !e.visite).length, 0);
 });
 
-test('les Almadies comptent 5 établissements, désormais tous visités', () => {
+test('les Almadies comptent 7 établissements, désormais tous visités', () => {
+  // Le questionnaire d'étude localise Chez Fatou et L'Adresse aux Almadies.
   const almadies = establishments.filter((e) => e.zone === 'Almadies');
-  assert.equal(almadies.length, 5);
-  assert.equal(almadies.filter((e) => e.visite).length, 5);
+  assert.equal(almadies.length, 7);
+  assert.equal(almadies.filter((e) => e.visite).length, 7);
+});
+
+test('plus aucun établissement n’est en attente de localisation', () => {
+  assert.equal(establishments.filter((e) => e.zone === 'À localiser').length, 0);
+  assert.equal(establishments.filter((e) => e.zone === 'Mermoz').length, 1);
 });
 
 test('synthèse vide : aucun équipement, couverture des visites inchangée', () => {
@@ -77,7 +83,7 @@ test('la couverture par zone additionne bien les établissements', () => {
   const total = s.zones.reduce((sum, z) => sum + z.identifies, 0);
   assert.equal(total, 35);
   const almadies = s.zones.find((z) => z.zone === 'Almadies')!;
-  assert.equal(almadies.visites, 5);
+  assert.equal(almadies.visites, 7);
 });
 
 test('hasAnyValue ignore les chaînes blanches', () => {

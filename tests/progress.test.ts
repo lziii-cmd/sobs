@@ -14,13 +14,13 @@ test('avancement global à zéro quand rien n’est saisi', () => {
   const progress = globalProgress({});
   assert.equal(progress.answered, 0);
   assert.equal(progress.percent, 0);
-  assert.equal(progress.total, 196);
+  assert.equal(progress.total, 97);
 });
 
 test('avancement global à 100 % quand tout est saisi', () => {
   const answers = Object.fromEntries(questions.map((q) => [q.id, { value: 'réponse' }]));
   const progress = globalProgress(answers);
-  assert.equal(progress.answered, 196);
+  assert.equal(progress.answered, 97);
   assert.equal(progress.percent, 100);
   assert.equal(progress.priorityAnswered, progress.priorityTotal);
 });
@@ -39,11 +39,11 @@ test('le marquage « à revoir » est comptabilisé', () => {
 });
 
 test('l’avancement par section ne déborde pas sur les autres', () => {
-  const progress = sectionProgress({ Q1: { value: 'Nourah' } }, 'cadre');
+  const progress = sectionProgress({ Q1: { value: 'un refus du gerant' } }, 'gamme');
   assert.equal(progress.answered, 1);
-  assert.equal(progress.total, questions.filter((q) => q.sectionId === 'cadre').length);
+  assert.equal(progress.total, questions.filter((q) => q.sectionId === 'gamme').length);
 
-  const autre = sectionProgress({ Q1: { value: 'Nourah' } }, 'bilan');
+  const autre = sectionProgress({ Q1: { value: 'un refus du gerant' } }, 'economie');
   assert.equal(autre.answered, 0);
 });
 
@@ -51,6 +51,6 @@ test('la somme des sections égale le total global', () => {
   const sections = allProgress({});
   assert.equal(
     sections.reduce((sum, s) => sum + s.total, 0),
-    196,
+    97,
   );
 });

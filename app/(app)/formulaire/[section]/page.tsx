@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { questions, sections } from '@/data/questions';
+import { groupIntro, questions, sections } from '@/data/questions';
 import { loadAnswers } from '@/lib/queries';
 import { sectionProgress } from '@/lib/progress';
 import QuestionField from '@/components/QuestionField';
@@ -65,9 +65,23 @@ export default async function SectionPage({ params }: { params: Promise<{ sectio
           return (
             <div key={question.id} className="space-y-4">
               {showGroup && (
-                <h2 className="pt-3 text-sm font-bold uppercase tracking-wide text-ink/45">
-                  {question.group}
-                </h2>
+                <div className="pt-3">
+                  <h2 className="text-sm font-bold uppercase tracking-wide text-ink/45">
+                    {question.group}
+                  </h2>
+                  {/* Certains intertitres portent un bloc de cadrage : il pose le
+                      constat sur lequel les questions suivantes reviennent. */}
+                  {groupIntro(section.id, question.group!)
+                    ?.split('\n\n')
+                    .map((paragraphe, index) => (
+                      <p
+                        key={index}
+                        className="mt-2 max-w-3xl text-sm leading-relaxed text-ink/65"
+                      >
+                        {paragraphe}
+                      </p>
+                    ))}
+                </div>
               )}
               <QuestionField
                 question={question}
