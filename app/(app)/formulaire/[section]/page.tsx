@@ -64,25 +64,32 @@ export default async function SectionPage({ params }: { params: Promise<{ sectio
 
           return (
             <div key={question.id} className="space-y-4">
-              {showGroup && (
-                <div className="pt-3">
-                  <h2 className="text-sm font-bold uppercase tracking-wide text-ink/45">
-                    {question.group}
-                  </h2>
-                  {/* Certains intertitres portent un bloc de cadrage : il pose le
-                      constat sur lequel les questions suivantes reviennent. */}
-                  {groupIntro(section.id, question.group!)
-                    ?.split('\n\n')
-                    .map((paragraphe, index) => (
-                      <p
-                        key={index}
-                        className="mt-2 max-w-3xl text-sm leading-relaxed text-ink/65"
-                      >
-                        {paragraphe}
-                      </p>
-                    ))}
-                </div>
-              )}
+              {showGroup &&
+                (() => {
+                  // Certains intertitres portent un bloc de cadrage : il pose le
+                  // constat sur lequel les questions qui suivent reviennent, et
+                  // doit donc se lire avant elles.
+                  const cadrage = groupIntro(section.id, question.group!);
+                  if (!cadrage) {
+                    return (
+                      <h2 className="pt-3 text-sm font-bold uppercase tracking-wide text-ink/45">
+                        {question.group}
+                      </h2>
+                    );
+                  }
+                  return (
+                    <section className="constat mt-4">
+                      <h2 className="text-sm font-bold uppercase tracking-wide text-sobs-700">
+                        {question.group}
+                      </h2>
+                      {cadrage.split('\n\n').map((paragraphe, index) => (
+                        <p key={index} className="mt-2.5 text-sm leading-relaxed text-ink/80">
+                          {paragraphe}
+                        </p>
+                      ))}
+                    </section>
+                  );
+                })()}
               <QuestionField
                 question={question}
                 initialValue={answer?.value ?? ''}

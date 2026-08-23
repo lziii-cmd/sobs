@@ -153,9 +153,9 @@ export async function buildPdf(input: PdfInput): Promise<Uint8Array> {
 
   // ------------------------------------------------------------- page de garde
   doc.gap(120);
-  doc.write('SOBOA — Rapport de stage', { size: 24, font: 'bold' });
+  doc.write('SOBOA — Étude du circuit CHR', { size: 24, font: 'bold' });
   doc.gap(6);
-  doc.write('Formulaire de collecte — réponses', { size: 16, color: GREEN });
+  doc.write('Questionnaire de collecte — réponses', { size: 16, color: GREEN });
   doc.gap(18);
   doc.write(
     "« Évaluation de la visibilité de nos marques et identification des leviers de croissance dans le circuit CHR de Dakar »",

@@ -43,7 +43,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-bold tracking-tight text-sobs-700">SOBOA — collecte</h1>
         <p className="mt-2 text-sm text-ink/60">
-          Formulaire de collecte du rapport de stage. Espace privé.
+          Questionnaire de collecte de l’étude SOBOA. Espace privé.
         </p>
 
         <form onSubmit={submit} className="card mt-6 space-y-4 p-5">

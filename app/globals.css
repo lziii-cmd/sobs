@@ -82,3 +82,16 @@ body {
   border: 1px solid #e7e5de;
   border-radius: 0.75rem;
 }
+
+/*
+ * Bloc de cadrage : le rappel du constat sur lequel portent les questions qui
+ * suivent. Il doit se lire avant elles, pas se fondre dans la page — d'où le
+ * fond coloré et le filet vertical.
+ */
+.constat {
+  background: var(--color-sobs-50);
+  border: 1px solid var(--color-sobs-200);
+  border-left: 4px solid var(--color-sobs-600);
+  border-radius: 0.75rem;
+  padding: 1rem 1.15rem;
+}

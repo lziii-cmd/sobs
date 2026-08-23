@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SOBOA — Formulaire de collecte',
-  description: 'Collecte des réponses pour le rapport de stage SOBOA.',
+  title: 'SOBOA — Questionnaire de collecte',
+  description: "Collecte des réponses pour l'étude SOBOA sur le circuit CHR de Dakar.",
   robots: { index: false, follow: false },
 };
 

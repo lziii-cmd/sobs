@@ -24,7 +24,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-2xl font-bold tracking-tight">Formulaire de collecte</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Questionnaire de collecte</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/65">
           Tu n’as pas à tout remplir d’un coup, ni dans l’ordre. Chaque réponse est enregistrée
           automatiquement dès que tu écris : tu peux fermer l’onglet et revenir plus tard, tout est
