@@ -12,9 +12,11 @@ export default async function GrillePage() {
       <header>
         <h1 className="text-xl font-bold tracking-tight">Grille de relevé — circuit CHR de Dakar</h1>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink/65">
-          Une ligne par établissement, 35 au total. Remplis-la de mémoire pour les 24 déjà visités —
-          même approximativement : une donnée incertaine signalée comme telle vaut mieux qu’une absence
-          de donnée. Puis complète sur place pour les 11 restants.
+          Une ligne par établissement, 50 au total, dont sept restent à visiter aux Almadies.
+          Remplis-la de mémoire pour les autres, même approximativement — une donnée incertaine
+          signalée comme telle vaut mieux qu’une absence de donnée. La colonne « Fiabilité » sert
+          justement à marquer ce qui reste à vérifier sur place, et « Visité » se coche une fois
+          la visite faite.
         </p>
         <p className="mt-2 max-w-3xl text-sm text-ink/55">
           Si tu manques de temps, remplis d’abord les colonnes marquées ● : Enseigne, Matériel de
@@ -23,6 +25,11 @@ export default async function GrillePage() {
             Voir la synthèse
           </Link>
           .
+        </p>
+        <p className="mt-3">
+          <a href="/api/export/grille" className="btn btn-primary">
+            Télécharger la grille (Excel)
+          </a>
         </p>
       </header>
 

@@ -1,14 +1,21 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { establishments } from '@/data/establishments';
+import { establishments, typeLabels } from '@/data/establishments';
 import { gridColumns } from '@/data/grid-columns';
-import type { GridData } from '@/lib/synthese';
+import { hasAnyValue, visiteEffective, type GridData } from '@/lib/synthese';
 
 type CellState = 'idle' | 'saving' | 'saved' | 'error';
 type Filter = 'tous' | 'visites' | 'restants' | 'vides';
 
 const DEBOUNCE_MS = 700;
+
+/** Valeur affichée par une colonne d'identification tant qu'elle n'a pas été corrigée. */
+function defautIdentite(e: (typeof establishments)[number], key: string): string | null {
+  if (key === 'type') return typeLabels[e.type];
+  if (key === 'visite') return e.visite ? 'Oui' : 'Non';
+  return null;
+}
 
 export default function GrilleTable({ initial }: { initial: GridData }) {
   const [data, setData] = useState<GridData>(initial);
@@ -19,17 +26,17 @@ export default function GrilleTable({ initial }: { initial: GridData }) {
 
   const rows = useMemo(() => {
     return establishments.filter((e) => {
-      const filled = Object.values(data[e.num] ?? {}).some((v) => (v ?? '').trim() !== '');
-      if (filter === 'visites') return e.visite;
-      if (filter === 'restants') return !e.visite;
+      const filled = hasAnyValue(data[e.num]);
+      if (filter === 'visites') return visiteEffective(e, data[e.num]);
+      if (filter === 'restants') return !visiteEffective(e, data[e.num]);
       if (filter === 'vides') return !filled;
       return true;
     });
   }, [data, filter]);
 
-  const filledCount = establishments.filter((e) =>
-    Object.values(data[e.num] ?? {}).some((v) => (v ?? '').trim() !== ''),
-  ).length;
+  const filledCount = establishments.filter((e) => hasAnyValue(data[e.num])).length;
+
+  const restants = establishments.filter((e) => !visiteEffective(e, data[e.num])).length;
 
   async function save(num: number, key: string, value: string) {
     const cellKey = `${num}:${key}`;
@@ -79,8 +86,8 @@ export default function GrilleTable({ initial }: { initial: GridData }) {
         {(
           [
             ['tous', `Tous (${establishments.length})`],
-            ['visites', 'Déjà visités'],
-            ['restants', 'Restant à visiter'],
+            ['visites', `Déjà visités (${establishments.length - restants})`],
+            ['restants', `Restant à visiter (${restants})`],
             ['vides', 'Lignes vides'],
           ] as [Filter, string][]
         ).map(([key, label]) => (
@@ -116,7 +123,6 @@ export default function GrilleTable({ initial }: { initial: GridData }) {
                 Établissement
               </th>
               <th className="px-2 py-2 text-xs font-semibold">Zone</th>
-              <th className="px-2 py-2 text-xs font-semibold">Visité</th>
               {gridColumns.map((col) => (
                 <th
                   key={col.key}
@@ -138,16 +144,8 @@ export default function GrilleTable({ initial }: { initial: GridData }) {
                   <td className="sticky left-0 z-10 bg-white px-2 py-1.5 text-xs text-ink/50">{e.num}</td>
                   <td className="sticky left-9 z-10 min-w-56 bg-white px-2 py-1.5 font-medium">
                     {e.nom}
-                    <span className="ml-1 text-xs font-normal text-ink/40">{e.type}</span>
                   </td>
                   <td className="whitespace-nowrap px-2 py-1.5 text-xs text-ink/60">{e.zone}</td>
-                  <td className="px-2 py-1.5 text-xs">
-                    {e.visite ? (
-                      <span className="text-sobs-700">Oui</span>
-                    ) : (
-                      <span className="text-amber-700">Non</span>
-                    )}
-                  </td>
 
                   {gridColumns.map((col) => {
                     const cellKey = `${e.num}:${col.key}`;
@@ -156,15 +154,16 @@ export default function GrilleTable({ initial }: { initial: GridData }) {
 
                     if (col.type === 'on' || col.type === 'choice') {
                       const options = col.type === 'on' ? ['O', 'N'] : (col.options ?? []);
+                      const defaut = col.identite ? defautIdentite(e, col.key) : null;
                       return (
                         <td key={col.key} className="px-1.5 py-1">
                           <select
                             aria-label={`${col.label} — ${e.nom}`}
-                            className={common}
+                            className={`${common} ${col.identite && value === '' ? 'text-ink/55' : ''}`}
                             value={value}
                             onChange={(ev) => change(e.num, col.key, ev.target.value, true)}
                           >
-                            <option value="">—</option>
+                            <option value="">{defaut ? `${defaut} (par défaut)` : '—'}</option>
                             {options.map((option) => (
                               <option key={option} value={option}>
                                 {option}

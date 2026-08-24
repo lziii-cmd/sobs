@@ -1,8 +1,8 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 import { questions, sections } from '../data/questions';
-import { establishments, typeLabels } from '../data/establishments';
-import { gridColumns } from '../data/grid-columns';
-import { computeSynthese, type GridData } from './synthese';
+import { establishments } from '../data/establishments';
+import { gridColumns, releveColumns } from '../data/grid-columns';
+import { computeSynthese, typeEffectif, visiteEffective, type GridData } from './synthese';
 import { globalProgress, type AnswerMap } from './progress';
 import { ellipsize, formatDateFr, sanitizeForPdf, wrapText } from './text';
 
@@ -258,12 +258,13 @@ function drawGrid(doc: Doc, grid: GridData): void {
   });
   doc.gap(12);
 
-  const compact = gridColumns.filter((c) => c.type !== 'text');
+  // Les colonnes d'identification ont déjà leur place à gauche : on ne les répète pas.
+  const compact = releveColumns.filter((c) => c.type !== 'text');
   const columns = [
     { key: '__num', label: 'N°', width: 24 },
-    { key: '__nom', label: 'Établissement', width: 170 },
-    { key: '__type', label: 'Type', width: 34 },
-    { key: '__zone', label: 'Zone', width: 74 },
+    { key: '__nom', label: 'Établissement', width: 146 },
+    { key: '__type', label: 'Type', width: 62 },
+    { key: '__zone', label: 'Zone', width: 70 },
     { key: '__visite', label: 'Visité', width: 34 },
     ...compact.map((c) => ({ key: c.key, label: c.short, width: c.key === 'fiabilite' ? 82 : 46 })),
   ];
@@ -289,9 +290,9 @@ function drawGrid(doc: Doc, grid: GridData): void {
     const values: Record<string, string> = {
       __num: String(e.num),
       __nom: e.nom,
-      __type: e.type,
+      __type: typeEffectif(e, row),
       __zone: e.zone,
-      __visite: e.visite ? 'Oui' : 'Non',
+      __visite: visiteEffective(e, row) ? 'Oui' : 'Non',
       ...row,
     };
     let x = MARGIN;
@@ -303,7 +304,7 @@ function drawGrid(doc: Doc, grid: GridData): void {
   }
 
   // Colonnes de texte libre, listées à part pour rester lisibles.
-  const textColumns = gridColumns.filter((c) => c.type === 'text');
+  const textColumns = releveColumns.filter((c) => c.type === 'text');
   const withText = establishments.filter((e) =>
     textColumns.some((c) => (grid[e.num]?.[c.key] ?? '').trim() !== ''),
   );
@@ -314,7 +315,10 @@ function drawGrid(doc: Doc, grid: GridData): void {
     doc.gap(12);
     for (const e of withText) {
       doc.ensure(50);
-      doc.write(`${e.num}. ${e.nom} — ${typeLabels[e.type]}, ${e.zone}`, { size: 10, font: 'bold' });
+      doc.write(`${e.num}. ${e.nom} — ${typeEffectif(e, grid[e.num])}, ${e.zone}`, {
+        size: 10,
+        font: 'bold',
+      });
       for (const col of textColumns) {
         const value = (grid[e.num]?.[col.key] ?? '').trim();
         if (value === '') continue;

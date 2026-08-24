@@ -14,17 +14,50 @@ export type GridColumn = {
   hint?: string;
   /** Colonne prioritaire : porte le diagnostic (cf. onglet « Mode d'emploi »). */
   priority?: boolean;
+  /**
+   * Colonne d'identification corrigeable : elle décrit l'établissement, pas le relevé.
+   * Vide, elle affiche la valeur par défaut de `data/establishments.ts` ; remplie, elle
+   * la corrige. Ces colonnes ne comptent jamais comme un relevé — voir `hasAnyValue`.
+   */
+  identite?: boolean;
   width: number;
 };
 
 /**
  * Liste déroulante de la colonne « Fiabilité », reprise de la validation de
- * données du fichier Excel. L'option « Non visité » a disparu de la nouvelle
- * grille : les 35 établissements y sont tous marqués visités.
+ * données du fichier Excel. L'option « Non visité » n'y figure pas : l'état de
+ * visite a sa propre colonne, « Visité », et la fiabilité répond à une autre
+ * question — sur quoi repose la ligne.
  */
 export const FIABILITE_OPTIONS = ['Souvenir précis', 'Estimation', 'À vérifier sur place'];
 
+/** Libellés de la colonne « Type », alignés sur `typeLabels` de `data/establishments.ts`. */
+export const TYPE_OPTIONS = ['Hôtel', 'Restaurant', 'Pub / Bar'];
+
+/** Libellés de la colonne « Visité ». */
+export const VISITE_OPTIONS = ['Oui', 'Non'];
+
 export const gridColumns: GridColumn[] = [
+  {
+    key: 'type',
+    label: 'Type',
+    short: 'Type',
+    type: 'choice',
+    options: TYPE_OPTIONS,
+    hint: 'Corrige la typologie si elle est fausse. Vide = celle retenue par défaut.',
+    identite: true,
+    width: 130,
+  },
+  {
+    key: 'visite',
+    label: 'Visité',
+    short: 'Visité',
+    type: 'choice',
+    options: VISITE_OPTIONS,
+    hint: 'Coche « Oui » une fois la visite faite.',
+    identite: true,
+    width: 100,
+  },
   {
     key: 'enseigne',
     label: 'Enseigne SOBOA',
@@ -138,6 +171,14 @@ export const gridColumns: GridColumn[] = [
 
 export const gridColumnByKey = (key: string): GridColumn | undefined =>
   gridColumns.find((c) => c.key === key);
+
+/** Clés des colonnes d'identification : elles ne comptent pas comme un relevé. */
+export const IDENTITY_KEYS: ReadonlySet<string> = new Set(
+  gridColumns.filter((c) => c.identite).map((c) => c.key),
+);
+
+/** Colonnes réellement relevées sur le terrain, hors identification. */
+export const releveColumns = gridColumns.filter((c) => !c.identite);
 
 /** Valeurs acceptées pour une colonne donnée. `null` = pas de contrainte de liste. */
 export function allowedValues(col: GridColumn): string[] | null {

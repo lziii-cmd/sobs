@@ -103,7 +103,7 @@ export const groups: QuestionGroup[] = [
     sectionId: 'equipement',
     name: 'RAPPEL DU CONSTAT',
     intro:
-      "Cinq établissements sont équipés en réfrigérateurs à froid ventilé et en PLV : Le Bideew, Le Kermel, Le Viking, le Club Olympique et L'Hibiscus. Les trois premiers sont désignés comme partenaires.\n\nCe sont également les établissements où l'entreprise domine visuellement la concurrence. Le dispositif produit donc l'effet recherché, mais il ne couvre que cinq établissements sur trente-cinq, et plusieurs comptes du classement n'en bénéficient pas.",
+      "Cinq établissements sont équipés en réfrigérateurs à froid ventilé et en PLV : Le Bideew, Le Kermel, Le Viking, le Club Olympique et L'Hibiscus. Les trois premiers sont désignés comme partenaires.\n\nCe sont également les établissements où l'entreprise domine visuellement la concurrence. Le dispositif produit donc l'effet recherché, mais il ne couvre qu'une poignée d'établissements sur l'ensemble du périmètre, et plusieurs comptes du classement n'en bénéficient pas.",
   },
   {
     sectionId: 'etablissements',
@@ -172,7 +172,7 @@ export const questions: Question[] = [
     id: 'Q6',
     sectionId: 'gamme',
     group: 'RAPPEL DU CONSTAT',
-    label: 'Le nombre exact de références proposées par chacun des trente-cinq établissements est-il connu ou reconstituable ?',
+    label: 'Le nombre exact de références proposées par chacun des établissements du périmètre est-il connu ou reconstituable ?',
     help: 'Cette donnée permettrait de mesurer le gisement au-delà des cinq établissements déjà identifiés.',
     chapter: 'Chapitre 4',
     type: 'long',
@@ -296,7 +296,7 @@ export const questions: Question[] = [
     id: 'Q19',
     sectionId: 'concurrence',
     label: "Dans combien d'établissements chaque marque concurrente est-elle référencée, et avec combien de références ?",
-    help: "La présence de Heineken, Desperados et Coca-Cola dans les trente-cinq établissements est établie. Il s'agit ici de mesurer leur poids relatif.",
+    help: "La présence de Heineken, Desperados et Coca-Cola dans les établissements du périmètre est établie. Il s'agit ici de mesurer leur poids relatif.",
     chapter: 'Chapitre 5',
     type: 'long',
     priority: true,

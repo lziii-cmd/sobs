@@ -1,0 +1,731 @@
+<title>Circuit CHR de Dakar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --paper: #faf9f6;
+    --surface: #ffffff;
+    --ink: #1b1b1f;
+    --ink-doux: #62655c;
+    --ink-tres-doux: #8b8d82;
+    --trait: #e2e0d7;
+    --trait-fort: #cfccc0;
+    --vert: #1f6e3c;
+    --vert-fonce: #17552f;
+    --vert-clair: #dcecdf;
+    --vert-pale: #f2f8f4;
+    --ambre: #8a6a1f;
+    --ambre-pale: #f6f0dd;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #181a15;
+      --surface: #1f221c;
+      --ink: #eae9e0;
+      --ink-doux: #9ba095;
+      --ink-tres-doux: #7c8177;
+      --trait: #30342b;
+      --trait-fort: #414537;
+      --vert: #6cbb8b;
+      --vert-fonce: #8fd0a8;
+      --vert-clair: #26412f;
+      --vert-pale: #1d2620;
+      --ambre: #d0ac5c;
+      --ambre-pale: #2e2819;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #181a15;
+    --surface: #1f221c;
+    --ink: #eae9e0;
+    --ink-doux: #9ba095;
+    --ink-tres-doux: #7c8177;
+    --trait: #30342b;
+    --trait-fort: #414537;
+    --vert: #6cbb8b;
+    --vert-fonce: #8fd0a8;
+    --vert-clair: #26412f;
+    --vert-pale: #1d2620;
+    --ambre: #d0ac5c;
+    --ambre-pale: #2e2819;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .page {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  /* ---------- Bandeau ---------- */
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vert);
+  }
+
+  h1 {
+    font-family: Fraunces, Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 5.5vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .chapeau {
+    max-width: 44rem;
+    color: var(--ink-doux);
+    font-size: 1.02rem;
+  }
+
+  .chapeau strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 1px;
+    background: var(--trait);
+    border-block: 1px solid var(--trait);
+    margin-top: 0.5rem;
+  }
+
+  .stat {
+    background: var(--paper);
+    padding: 0.9rem 0.2rem 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .stat b {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 1.7rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .stat span {
+    font-size: 0.78rem;
+    color: var(--ink-doux);
+  }
+
+  /* ---------- Sections ---------- */
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  h2 {
+    font-family: Fraunces, Georgia, serif;
+    font-weight: 600;
+    font-size: 1.45rem;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .section-intro {
+    color: var(--ink-doux);
+    max-width: 42rem;
+    font-size: 0.94rem;
+    margin: -0.4rem 0 0;
+  }
+
+  /* ---------- Zones ---------- */
+
+  .zones {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .zone {
+    border-top: 1px solid var(--trait);
+    padding-top: 1.1rem;
+    padding-bottom: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .zone:last-child {
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .zone-tete {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .zone-nom {
+    font-family: Fraunces, Georgia, serif;
+    font-size: 1.22rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .zone-compte {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-tres-doux);
+  }
+
+  .zone-note {
+    font-size: 0.82rem;
+    color: var(--ambre);
+    margin-left: auto;
+    text-align: right;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.93rem;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  tbody tr + tr td {
+    border-top: 1px solid var(--trait);
+  }
+
+  td {
+    padding: 0.42rem 0.6rem 0.42rem 0;
+    vertical-align: baseline;
+  }
+
+  td.num {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-tres-doux);
+    width: 2.6rem;
+    font-size: 0.85rem;
+  }
+
+  td.nom {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  td.typo {
+    color: var(--ink-doux);
+    font-size: 0.84rem;
+    white-space: nowrap;
+    padding-right: 0.9rem;
+  }
+
+  td.marques {
+    color: var(--ink-doux);
+    font-size: 0.87rem;
+    padding-right: 0;
+  }
+
+  /* ---------- Marqueurs ---------- */
+
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.12rem 0.4rem;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .tag-equipe {
+    background: var(--vert-clair);
+    color: var(--vert-fonce);
+  }
+
+  .tag-partenaire {
+    background: var(--vert);
+    color: var(--paper);
+  }
+
+  .tag-top {
+    background: var(--ambre-pale);
+    color: var(--ambre);
+  }
+
+  .tag-visiter {
+    background: var(--ambre);
+    color: var(--paper);
+  }
+
+  .tag-neuf {
+    border: 1px solid var(--trait-fort);
+    color: var(--ink-tres-doux);
+  }
+
+  .tag-zone {
+    border: 1px dashed var(--trait-fort);
+    color: var(--ink-tres-doux);
+  }
+
+  .legende {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    font-size: 0.84rem;
+    color: var(--ink-doux);
+    padding-bottom: 0.3rem;
+  }
+
+  .legende span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* ---------- Colonnes de relevé ---------- */
+
+  .colonnes {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .colonnes thead th {
+    text-align: left;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-tres-doux);
+    padding: 0 0.6rem 0.5rem 0;
+    border-bottom: 1px solid var(--trait-fort);
+  }
+
+  .colonnes td {
+    padding: 0.5rem 0.6rem 0.5rem 0;
+    border-top: 1px solid var(--trait);
+    vertical-align: top;
+  }
+
+  .colonnes tr.prio td {
+    background: var(--vert-pale);
+  }
+
+  .colonnes tr.prio td:first-child {
+    box-shadow: inset 2px 0 0 var(--vert);
+    padding-left: 0.6rem;
+  }
+
+  .col-nom {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .col-valeurs {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    color: var(--vert-fonce);
+    white-space: nowrap;
+  }
+
+  .col-aide {
+    color: var(--ink-doux);
+    font-size: 0.88rem;
+  }
+
+  .puce-prio {
+    color: var(--vert);
+    font-weight: 700;
+  }
+
+  /* ---------- Notes de fin ---------- */
+
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1.6rem 2.5rem;
+  }
+
+  .note h3 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--vert);
+    margin: 0 0 0.5rem;
+  }
+
+  .note p {
+    margin: 0 0 0.6rem;
+    color: var(--ink-doux);
+    font-size: 0.9rem;
+  }
+
+  .note p:last-child {
+    margin-bottom: 0;
+  }
+
+  .note strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  footer {
+    border-top: 1px solid var(--trait);
+    padding-top: 1.2rem;
+    font-size: 0.82rem;
+    color: var(--ink-tres-doux);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+
+  footer code {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    color: var(--ink-doux);
+  }
+
+  @media (max-width: 34rem) {
+    td.nom { white-space: normal; }
+    .zone-note { margin-left: 0; text-align: left; }
+  }
+
+  @media print {
+    .page { padding: 0; gap: 2rem; max-width: none; }
+    .zone { break-inside: avoid; }
+    .stat { background: transparent; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Étude SOBOA — échantillonnage</div>
+    <h1>Circuit CHR de Dakar</h1>
+    <p class="chapeau">
+      Les <strong>50 établissements</strong> du périmètre, classés par zone et numérotés comme
+      dans la grille de relevé en ligne. Cette liste remplace l'échantillon de 35 repris du
+      fichier Excel : <strong>15 établissements entrent</strong>, <strong>cinq changent de zone</strong>,
+      et Lagon 2 est conservé bien qu'absent du nouvel échantillonnage.
+      <strong>Sept visites restent à faire</strong>, toutes aux Almadies.
+    </p>
+
+    <div class="stats">
+      <div class="stat"><b>50</b><span>établissements</span></div>
+      <div class="stat"><b>10</b><span>zones</span></div>
+      <div class="stat"><b>43</b><span>visités sur 50</span></div>
+      <div class="stat"><b>13</b><span>colonnes à relever</span></div>
+      <div class="stat"><b>4</b><span>colonnes prioritaires</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>Les établissements, zone par zone</h2>
+    <p class="section-intro">
+      L'ordre des zones suit la numérotation de la grille : la première zone est celle du n° 1.
+      À l'intérieur d'une zone, les numéros ne se suivent pas nécessairement — ils reprennent
+      l'ordre de l'échantillonnage transmis.
+    </p>
+
+    <div class="legende">
+      <span><span class="tag tag-visiter">À visiter</span> visite encore à faire</span>
+      <span><span class="tag tag-partenaire">Partenaire</span> désigné comme tel par l'étude</span>
+      <span><span class="tag tag-equipe">Froid + PLV</span> réfrigérateur ventilé et PLV en place</span>
+      <span><span class="tag tag-top">2 réf.</span> gros compte ne référençant que Gazelle et Flag</span>
+      <span><span class="tag tag-neuf">Nouveau</span> entré au périmètre le 24/08/2026</span>
+      <span><span class="tag tag-zone">Zone revue</span> reclassé par l'échantillonnage</span>
+    </div>
+
+    <div class="zones">
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Corniche Est</span>
+          <span class="zone-compte">6 établissements</span>
+          <span class="zone-note">Quatre des cinq gros comptes du périmètre</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">1</td><td class="nom">Pullman Teranga / Teranga Beach Club</td><td class="typo">Hôtel</td><td class="marques"><span class="tag tag-top">2 réf.</span></td></tr>
+          <tr><td class="num">3</td><td class="nom">Club de l'Union</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">4</td><td class="nom">Lagon 1</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-top">2 réf.</span></td></tr>
+          <tr><td class="num">5</td><td class="nom">Lagon 2</td><td class="typo">Hôtel</td><td class="marques"><span class="tag tag-top">2 réf.</span> Conservé hors échantillonnage</td></tr>
+          <tr><td class="num">6</td><td class="nom">Club Corse</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">7</td><td class="nom">Océanium</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Port</span>
+          <span class="zone-compte">1 établissement</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">2</td><td class="nom">Club de Pêche</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Point E</span>
+          <span class="zone-compte">5 établissements</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">8</td><td class="nom">Just For U</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">16</td><td class="nom">Trattoria Da Alex</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">25</td><td class="nom">Favélas</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">37</td><td class="nom">Jardin Thaïlandais</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">50</td><td class="nom">L'Hibiscus</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-equipe">Froid + PLV</span> <span class="tag tag-neuf">Nouveau</span></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Ville</span>
+          <span class="zone-compte">10 établissements</span>
+          <span class="zone-note">Les trois partenaires de l'étude</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">9</td><td class="nom">Novotel</td><td class="typo">Hôtel</td><td class="marques"></td></tr>
+          <tr><td class="num">10</td><td class="nom">Le Bideew (Institut français)</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-partenaire">Partenaire</span> <span class="tag tag-equipe">Froid + PLV</span></td></tr>
+          <tr><td class="num">11</td><td class="nom">Resto Chinois</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">12</td><td class="nom">Restaurant Farid</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">13</td><td class="nom">Le Viking</td><td class="typo">Pub / Bar</td><td class="marques"><span class="tag tag-partenaire">Partenaire</span> <span class="tag tag-equipe">Froid + PLV</span></td></tr>
+          <tr><td class="num">14</td><td class="nom">Café de Rome</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">15</td><td class="nom">Le Kermel (marché Kermel)</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-partenaire">Partenaire</span> <span class="tag tag-equipe">Froid + PLV</span></td></tr>
+          <tr><td class="num">21</td><td class="nom">Beluga</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">22</td><td class="nom">Hôtel Savana</td><td class="typo">Hôtel</td><td class="marques"></td></tr>
+          <tr><td class="num">39</td><td class="nom">L'Impérial</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Amitié</span>
+          <span class="zone-compte">3 établissements</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">17</td><td class="nom">Jardin de l'Amitié</td><td class="typo">Pub / Bar</td><td class="marques"></td></tr>
+          <tr><td class="num">18</td><td class="nom">Bazoff</td><td class="typo">Pub / Bar</td><td class="marques"></td></tr>
+          <tr><td class="num">40</td><td class="nom">Casa Mara</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Corniche Ouest</span>
+          <span class="zone-compte">5 établissements</span>
+          <span class="zone-note">Zone créée par le nouvel échantillonnage</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">19</td><td class="nom">Azalaï</td><td class="typo">Hôtel</td><td class="marques"><span class="tag tag-zone">Zone revue</span> était en Ville</td></tr>
+          <tr><td class="num">20</td><td class="nom">Terrou Bi</td><td class="typo">Hôtel</td><td class="marques"><span class="tag tag-top">2 réf.</span> <span class="tag tag-zone">Zone revue</span></td></tr>
+          <tr><td class="num">23</td><td class="nom">Noom Hôtel</td><td class="typo">Hôtel</td><td class="marques"><span class="tag tag-top">2 réf.</span> <span class="tag tag-zone">Zone revue</span></td></tr>
+          <tr><td class="num">24</td><td class="nom">Ayoka (Noom Hôtel)</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-zone">Zone revue</span> à l'intérieur du Noom</td></tr>
+          <tr><td class="num">45</td><td class="nom">Relais</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span> place du Souvenir africain</td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Avenue Bourguiba</span>
+          <span class="zone-compte">1 établissement</span>
+          <span class="zone-note">Zone créée par le nouvel échantillonnage</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">26</td><td class="nom">L'Héritage</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-zone">Zone revue</span> était en Ville</td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Yoff</span>
+          <span class="zone-compte">3 établissements</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">27</td><td class="nom">Le Tandem</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">46</td><td class="nom">Sao Brasil</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">48</td><td class="nom">Onomo</td><td class="typo">Hôtel</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Almadies</span>
+          <span class="zone-compte">14 établissements · 7 à visiter</span>
+          <span class="zone-note">Les sept visites restantes du périmètre sont ici</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">28</td><td class="nom">Chez Fatou</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">30</td><td class="nom">Bahia Beach Club</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-visiter">À visiter</span></td></tr>
+          <tr><td class="num">31</td><td class="nom">Le Carré</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-visiter">À visiter</span></td></tr>
+          <tr><td class="num">32</td><td class="nom">La Cabane du Pêcheur</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">33</td><td class="nom">Sharky's</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">34</td><td class="nom">L'Adresse</td><td class="typo">Restaurant</td><td class="marques"></td></tr>
+          <tr><td class="num">35</td><td class="nom">Jardin d'Orient</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-visiter">À visiter</span></td></tr>
+          <tr><td class="num">36</td><td class="nom">Le Cabanon</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-visiter">À visiter</span> <span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">41</td><td class="nom">Arisu</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">42</td><td class="nom">Boma</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">43</td><td class="nom">Chez Katia</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-visiter">À visiter</span> <span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">44</td><td class="nom">Dolce Vita</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">47</td><td class="nom">Jet Café</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-visiter">À visiter</span> <span class="tag tag-neuf">Nouveau</span></td></tr>
+          <tr><td class="num">49</td><td class="nom">Basilic</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-visiter">À visiter</span> <span class="tag tag-neuf">Nouveau</span></td></tr>
+        </tbody></table></div>
+      </div>
+
+      <div class="zone">
+        <div class="zone-tete">
+          <span class="zone-nom">Mermoz</span>
+          <span class="zone-compte">2 établissements</span>
+        </div>
+        <div class="table-wrap"><table><tbody>
+          <tr><td class="num">29</td><td class="nom">Club Olympique</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-equipe">Froid + PLV</span></td></tr>
+          <tr><td class="num">38</td><td class="nom">Chez Lulu</td><td class="typo">Restaurant</td><td class="marques"><span class="tag tag-neuf">Nouveau</span></td></tr>
+        </tbody></table></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Ce qui se relève pour chaque établissement</h2>
+    <p class="section-intro">
+      Treize colonnes de relevé par ligne, précédées de deux colonnes qui décrivent
+      l'établissement lui-même. Les quatre marquées <span class="puce-prio">●</span> portent le
+      diagnostic : si le temps manque, ce sont elles qu'il faut remplir en premier.
+      Une case vide signifie « je ne sais pas » — ce n'est pas la même chose qu'un « N ».
+    </p>
+
+    <div class="table-wrap">
+      <table class="colonnes">
+        <thead>
+          <tr>
+            <th>Colonne</th>
+            <th>Valeurs</th>
+            <th>Ce qu'on cherche</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="col-nom">Type</td><td class="col-valeurs">3 choix</td><td class="col-aide">Hôtel · Restaurant · Pub / Bar. Corrige la typologie retenue par défaut — c'est ce que demande Q4 du questionnaire des missions.</td></tr>
+          <tr><td class="col-nom">Visité</td><td class="col-valeurs">Oui / Non</td><td class="col-aide">Se coche une fois la visite faite. Sept établissements attendent encore.</td></tr>
+          <tr class="prio"><td class="col-nom"><span class="puce-prio">●</span> Enseigne SOBOA</td><td class="col-valeurs">O / N</td><td class="col-aide">Enseigne aux couleurs de la marque en façade.</td></tr>
+          <tr><td class="col-nom">Parasols</td><td class="col-valeurs">nombre</td><td class="col-aide">Un ordre de grandeur suffit.</td></tr>
+          <tr><td class="col-nom">Mobilier terrasse</td><td class="col-valeurs">O / N</td><td class="col-aide">Tables et chaises marquées.</td></tr>
+          <tr class="prio"><td class="col-nom"><span class="puce-prio">●</span> Matériel de froid</td><td class="col-valeurs">O / N</td><td class="col-aide">Réfrigérateur ou armoire froide aux couleurs SOBOA.</td></tr>
+          <tr class="prio"><td class="col-nom"><span class="puce-prio">●</span> PLV / affiches</td><td class="col-valeurs">O / N</td><td class="col-aide">Affiches, présentoirs, menus, verres marqués.</td></tr>
+          <tr><td class="col-nom">Nb références SOBOA</td><td class="col-valeurs">nombre</td><td class="col-aide">Combien de produits SOBOA différents sont proposés, sur les treize du portefeuille.</td></tr>
+          <tr><td class="col-nom">Marques SOBOA proposées</td><td class="col-valeurs">texte</td><td class="col-aide">Gazelle, Flag, Racines, 33 Export…</td></tr>
+          <tr class="prio"><td class="col-nom"><span class="puce-prio">●</span> Marques concurrentes</td><td class="col-valeurs">texte</td><td class="col-aide">Heineken, Desperados, Coca-Cola…</td></tr>
+          <tr><td class="col-nom">Supports concurrents</td><td class="col-valeurs">texte</td><td class="col-aide">Où ils sont placés par rapport aux nôtres. Ex. : une enseigne Heineken en façade, un frigo Coca.</td></tr>
+          <tr><td class="col-nom">Volume estimé</td><td class="col-valeurs">fûts / mois</td><td class="col-aide">Estimation mensuelle, même approximative.</td></tr>
+          <tr><td class="col-nom">Note visibilité</td><td class="col-valeurs">0 → 5</td><td class="col-aide">0 = aucune visibilité, 5 = visibilité optimale.</td></tr>
+          <tr><td class="col-nom">Fiabilité</td><td class="col-valeurs">3 choix</td><td class="col-aide">Souvenir précis · Estimation · À vérifier sur place. C'est la colonne qui dit sur quoi repose la ligne.</td></tr>
+          <tr><td class="col-nom">Commentaire libre</td><td class="col-valeurs">texte</td><td class="col-aide">Tout ce que les autres colonnes ne captent pas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ce que le questionnaire dit déjà de ces lieux</h2>
+    <div class="notes">
+      <div class="note">
+        <h3>Le dispositif qui marche</h3>
+        <p>
+          <strong>Cinq établissements</strong> sont équipés en réfrigérateurs à froid ventilé et en PLV :
+          Le Bideew, Le Kermel, Le Viking, le Club Olympique et L'Hibiscus. Les trois premiers sont
+          désignés comme partenaires.
+        </p>
+        <p>
+          Ce sont aussi les établissements où l'entreprise domine visuellement la concurrence.
+          L'effet recherché est donc obtenu — mais sur cinq lieux seulement, et plusieurs gros
+          comptes n'en bénéficient pas.
+        </p>
+      </div>
+      <div class="note">
+        <h3>Le manque à gagner</h3>
+        <p>
+          Le portefeuille CHR compte <strong>treize références</strong> : quatre bières et neuf
+          boissons gazeuses. Or cinq des meilleurs points de vente — Lagon 1, Lagon 2, Terrou Bi,
+          le Teranga Beach Club et le Noom — n'en référencent que deux, la Gazelle et la Flag.
+        </p>
+        <p>
+          Ces établissements servent nécessairement des boissons gazeuses, et Coca-Cola est présent
+          sur la totalité du périmètre : ils les achètent donc au concurrent.
+        </p>
+      </div>
+      <div class="note">
+        <h3>Ce qui a changé le 24 août 2026</h3>
+        <p>
+          L'échantillonnage transmis compte 49 établissements et <strong>fait foi sur les zones</strong>.
+          Quinze entrent au périmètre, dont L'Hibiscus, que le questionnaire citait déjà sans qu'il
+          figure dans la grille.
+        </p>
+        <p>
+          <strong>Lagon 2</strong> n'y figure pas mais a été conservé : le questionnaire le cite parmi
+          les meilleurs points de vente. Il porte le n° 5, à la suite de Lagon 1.
+        </p>
+        <p>
+          Le même jour, <code>Questionnaire_missions_SOBOA.docx</code> a fixé les sept visites
+          restantes et la typologie de référence — trente-neuf restaurants, huit hôtels, trois pubs.
+        </p>
+      </div>
+      <div class="note">
+        <h3>Ce qui se corrige en ligne</h3>
+        <p>
+          <strong>Type</strong> et <strong>Visité</strong> sont pré-remplis avec la valeur retenue
+          par l'étude, et se corrigent directement dans la grille. La typologie des quinze entrées
+          de 2026 est portée par défaut : c'est elle qu'il faut vérifier en premier.
+        </p>
+        <p>
+          La grille se télécharge au format Excel depuis la page « Grille » — trois onglets, listes
+          déroulantes comprises, synthèse recalculée à l'export.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Étude SOBOA — circuit CHR de Dakar</span>
+    <span>50 établissements · 10 zones · 43 visités, 7 à faire</span>
+    <span>Sources : échantillonnage du 24/08/2026, <code>Questionnaire_missions_SOBOA.docx</code>, <code>Grille_releve_CHR_SOBOA.xlsx</code></span>
+  </footer>
+
+</div>

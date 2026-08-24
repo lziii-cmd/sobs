@@ -1,6 +1,29 @@
-import { establishments } from '../data/establishments';
+import { establishments, typeLabels, type Establishment } from '../data/establishments';
+import { IDENTITY_KEYS } from '../data/grid-columns';
 
 export type GridData = Record<number, Record<string, string>>;
+
+export type GridRow = Record<string, string> | undefined;
+
+/**
+ * Typologie retenue pour un établissement : la correction saisie en ligne si elle
+ * existe, sinon celle portée par défaut dans `data/establishments.ts`.
+ */
+export function typeEffectif(e: Establishment, row: GridRow): string {
+  const correction = (row?.type ?? '').trim();
+  return correction !== '' ? correction : typeLabels[e.type];
+}
+
+/**
+ * État de visite retenu : la correction saisie en ligne si elle existe, sinon la
+ * valeur par défaut. Une case vide n'est pas un « non » — c'est l'absence de correction.
+ */
+export function visiteEffective(e: Establishment, row: GridRow): boolean {
+  const correction = (row?.visite ?? '').trim();
+  if (correction === 'Oui') return true;
+  if (correction === 'Non') return false;
+  return e.visite;
+}
 
 const isO = (v: string | undefined) => (v ?? '').trim().toUpperCase() === 'O';
 const isN = (v: string | undefined) => (v ?? '').trim().toUpperCase() === 'N';
@@ -18,7 +41,7 @@ export type EquipmentStat = {
   label: string;
   oui: number;
   renseignes: number;
-  /** Part de « oui » sur les 35 établissements identifiés. */
+  /** Part de « oui » sur l’ensemble des établissements identifiés. */
   partSurTotal: number;
 };
 
@@ -79,7 +102,7 @@ export function computeSynthese(data: GridData): Synthese {
   for (const e of establishments) {
     const stat = zoneMap.get(e.zone) ?? { zone: e.zone, identifies: 0, visites: 0, renseignes: 0 };
     stat.identifies += 1;
-    if (e.visite) stat.visites += 1;
+    if (visiteEffective(e, data[e.num])) stat.visites += 1;
     if (hasAnyValue(data[e.num])) stat.renseignes += 1;
     zoneMap.set(e.zone, stat);
   }
@@ -101,7 +124,7 @@ export function computeSynthese(data: GridData): Synthese {
     return values.every((v) => isN(v));
   }).length;
 
-  const visites = establishments.filter((e) => e.visite).length;
+  const visites = establishments.filter((e) => visiteEffective(e, data[e.num])).length;
 
   return {
     equipements,
@@ -118,7 +141,14 @@ export function computeSynthese(data: GridData): Synthese {
   };
 }
 
+/**
+ * Une ligne est « renseignée » dès qu'une colonne de relevé porte une valeur.
+ * Les colonnes d'identification (type, visite) en sont exclues : corriger une
+ * typologie ne veut pas dire qu'on a relevé l'établissement.
+ */
 export function hasAnyValue(row: Record<string, string> | undefined): boolean {
   if (!row) return false;
-  return Object.values(row).some((v) => typeof v === 'string' && v.trim() !== '');
+  return Object.entries(row).some(
+    ([key, v]) => !IDENTITY_KEYS.has(key) && typeof v === 'string' && v.trim() !== '',
+  );
 }

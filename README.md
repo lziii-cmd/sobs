@@ -1,12 +1,13 @@
 # SOBS — Questionnaire de collecte SOBOA
 
 Site privé à deux comptes pour collecter, au fil de l'eau, les réponses au questionnaire de l'étude
-SOBOA, remplir la grille de relevé des 35 établissements CHR de Dakar, échanger des fichiers,
+SOBOA, remplir la grille de relevé des 50 établissements CHR de Dakar, échanger des fichiers,
 et exporter l'ensemble en PDF (`question : réponse`).
 
 - **97 questions** réparties en 7 sections, sauvegarde automatique à la frappe
 - **Historique des versions** : chaque modification d'une réponse est conservée
-- **Grille de relevé** 35 établissements × 13 colonnes, sauvegarde cellule par cellule
+- **Grille de relevé** 50 établissements × 13 colonnes de relevé, plus le type et l'état de
+  visite corrigeables en ligne ; sauvegarde cellule par cellule ; export Excel à trois onglets
 - **Synthèse** recalculée en direct à partir de la grille
 - **Fichiers** dans les deux sens, stockés en base, photos réduites automatiquement
 - **Export PDF** réservé au compte d'administration, limité aux questions répondues
